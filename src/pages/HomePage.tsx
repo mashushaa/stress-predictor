@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
 import { Brain, ArrowRight, Heart, Shield } from "lucide-react";
 import campusBackground from "@/assets/campus-background.jpg";
 
 const HomePage = () => {
-  const navigate = useNavigate();
+  const handleStartClick = () => {
+    // Use window.location for now to test if component renders
+    window.location.href = '/questionnaire';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-soft">
@@ -32,7 +34,7 @@ const HomePage = () => {
           </p>
           
           <Button 
-            onClick={() => navigate('/questionnaire')}
+            onClick={handleStartClick}
             size="lg"
             className="bg-gradient-primary hover:shadow-medium transition-all duration-300 transform hover:scale-105 text-lg px-8 py-4 h-auto"
           >
