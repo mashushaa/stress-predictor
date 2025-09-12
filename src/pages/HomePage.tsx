@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Brain, ArrowRight, Heart, Shield } from "lucide-react";
-import campusBackground from "@/assets/campus-background.jpg";
+import cloudBackground from "@/assets/cloud-background.png";
 
 const HomePage = () => {
   const handleStartClick = () => {
-    // Use window.location for now to test if component renders
+    // Use window.location for consistent navigation
     window.location.href = '/questionnaire';
   };
 
@@ -14,7 +14,7 @@ const HomePage = () => {
       {/* Hero Section */}
       <div 
         className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${campusBackground})` }}
+        style={{ backgroundImage: `url(${cloudBackground})` }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent"></div>
         

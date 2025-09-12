@@ -39,9 +39,9 @@ const ResultsPage = () => {
     if (storedResults) {
       setResults(JSON.parse(storedResults));
     } else {
-      navigate('/questionnaire');
+      window.location.href = '/questionnaire';
     }
-  }, [navigate]);
+  }, []);
 
   if (!results) {
     return (
@@ -232,7 +232,7 @@ const ResultsPage = () => {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={() => navigate('/questionnaire')}
+              onClick={() => window.location.href = '/questionnaire'}
               variant="outline"
               size="lg"
               className="flex items-center gap-2"
@@ -241,7 +241,7 @@ const ResultsPage = () => {
               Retake Questionnaire
             </Button>
             <Button
-              onClick={() => navigate('/')}
+              onClick={() => window.location.href = '/'}
               size="lg"
               className="bg-gradient-primary hover:shadow-medium transition-all duration-300 flex items-center gap-2"
             >

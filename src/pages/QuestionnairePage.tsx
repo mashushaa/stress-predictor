@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
-import QuestionnaireSection, { Field } from "@/components/QuestionnaireSection";
+import QuestionnaireStep from "@/components/QuestionnaireStep";
+import { Field } from "@/components/QuestionnaireSection";
 import { Loader2 } from "lucide-react";
 
 export interface QuestionnaireData {
@@ -32,6 +30,7 @@ export interface QuestionnaireData {
 
 const QuestionnairePage = () => {
   const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<QuestionnaireData>({
     anxiety_level: 0,
@@ -108,12 +107,23 @@ const QuestionnairePage = () => {
     }
   ];
 
-  const totalFields = sections.reduce((acc, section) => acc + section.fields.length, 0);
-  const completedFields = Object.keys(formData).length;
-  const progress = (completedFields / totalFields) * 100;
+  const updateFormData = (key: keyof QuestionnaireData, value: number) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleNext = () => {
+    if (currentStep < sections.length) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleSubmit = async () => {
     setIsLoading(true);
 
     try {
@@ -133,7 +143,8 @@ const QuestionnairePage = () => {
       // Store results in localStorage for the results page
       localStorage.setItem('stressPredictionResults', JSON.stringify(mockResponse));
       
-      navigate('/results');
+      // Use window.location instead of navigate to avoid router issues
+      window.location.href = '/results';
     } catch (error) {
       toast({
         title: "Error",
@@ -145,66 +156,21 @@ const QuestionnairePage = () => {
     }
   };
 
-  const updateFormData = (key: keyof QuestionnaireData, value: number) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
-  };
+  const currentSection = sections[currentStep - 1];
 
   return (
-    <div className="min-h-screen bg-gradient-soft py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-            Stress Assessment Questionnaire
-          </h1>
-          <p className="text-lg text-muted-foreground mb-6">
-            Please answer all questions honestly. This will help us provide you with accurate results.
-          </p>
-          
-          <div className="max-w-md mx-auto">
-            <div className="flex justify-between text-sm text-muted-foreground mb-2">
-              <span>Progress</span>
-              <span>{Math.round(progress)}%</span>
-            </div>
-            <Progress value={progress} className="h-2" />
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {sections.map((section, index) => (
-            <Card key={index} className="bg-gradient-card shadow-soft border-0">
-              <CardHeader>
-                <CardTitle className="text-xl text-foreground">{section.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <QuestionnaireSection
-                  fields={section.fields}
-                  formData={formData}
-                  updateFormData={updateFormData}
-                />
-              </CardContent>
-            </Card>
-          ))}
-
-          <div className="flex justify-center pt-6">
-            <Button 
-              type="submit" 
-              disabled={isLoading}
-              size="lg"
-              className="bg-gradient-primary hover:shadow-medium transition-all duration-300 px-12 py-3 h-auto text-lg"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                'Submit Assessment'
-              )}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <QuestionnaireStep
+      stepNumber={currentStep}
+      totalSteps={sections.length}
+      title={currentSection.title}
+      fields={currentSection.fields}
+      formData={formData}
+      updateFormData={updateFormData}
+      onNext={handleNext}
+      onPrevious={handlePrevious}
+      onSubmit={handleSubmit}
+      isLoading={isLoading}
+    />
   );
 };
 
