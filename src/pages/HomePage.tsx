@@ -33,7 +33,7 @@ const HomePage = () => {
       {user && (
         <div className="absolute top-6 right-6 z-50 flex flex-col items-end gap-3">
           <div className="text-white text-sm font-medium bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 shadow-lg">
-            Привет, {user.email}
+            Hi, {user.email}
           </div>
           <Button 
             variant="outline" 
@@ -42,7 +42,7 @@ const HomePage = () => {
             className="bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm shadow-lg"
           >
             <LogOut className="h-4 w-4 mr-2" />
-            Выйти
+            Exit
           </Button>
         </div>
       )}
