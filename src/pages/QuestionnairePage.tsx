@@ -4,7 +4,7 @@ import { toast } from "@/hooks/use-toast";
 import QuestionnaireStep from "@/components/QuestionnaireStep";
 import { Field } from "@/components/QuestionnaireSection";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface QuestionnaireData {

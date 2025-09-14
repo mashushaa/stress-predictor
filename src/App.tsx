@@ -8,7 +8,7 @@ import QuestionnairePage from "./pages/QuestionnairePage";
 import ResultsPage from "./pages/ResultsPage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
-import { AuthProvider } from "./hooks/useAuth";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
