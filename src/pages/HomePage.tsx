@@ -74,7 +74,7 @@ const HomePage = () => {
             size="lg"
             className="bg-gradient-primary hover:shadow-medium transition-all duration-300 transform hover:scale-105 text-lg px-8 py-4 h-auto"
           >
-            {user ? 'Начать тестирование' : 'Войти и начать'}
+            {user ? 'Start' : 'Log in and start'}
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
@@ -117,7 +117,7 @@ const HomePage = () => {
               </div>
               <h3 className="text-xl font-semibold mb-4 text-foreground">Privacy First</h3>
               <p className="text-muted-foreground">
-                Ваши ответы обрабатываются безопасно и сохраняются в защищенной базе данных.
+                Your answers are processed confidentially and stored in a protected database.
               </p>
             </Card>
           </div>
