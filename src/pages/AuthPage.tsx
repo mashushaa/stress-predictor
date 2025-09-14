@@ -42,14 +42,14 @@ const AuthPage = () => {
 
         if (error) {
           toast({
-            title: "Ошибка регистрации",
+            title: "Registration error",
             description: error.message,
             variant: "destructive",
           });
         } else {
           toast({
-            title: "Регистрация успешна",
-            description: "Проверьте email для подтверждения аккаунта",
+            title: "Registration completed",
+            description: "Check email to confirm the account",
           });
         }
       } else {
@@ -60,21 +60,21 @@ const AuthPage = () => {
 
         if (error) {
           toast({
-            title: "Ошибка входа",
+            title: "Log in error",
             description: error.message,
             variant: "destructive",
           });
         } else {
           toast({
-            title: "Успешный вход",
-            description: "Добро пожаловать!",
+            title: " Log in successful",
+            description: "Welcome!",
           });
           navigate("/");
         }
       }
     } catch (error: any) {
       toast({
-        title: "Ошибка",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -88,12 +88,12 @@ const AuthPage = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl text-center">
-            {isSignUp ? "Регистрация" : "Вход"}
+            {isSignUp ? "Sign in" : "Log in"}
           </CardTitle>
           <CardDescription className="text-center">
             {isSignUp 
-              ? "Создайте аккаунт для сохранения результатов" 
-              : "Войдите в свой аккаунт"
+              ? "Create an account to preserve the results" 
+              : "Log in your account"
             }
           </CardDescription>
         </CardHeader>
@@ -124,7 +124,7 @@ const AuthPage = () => {
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isSignUp ? "Зарегистрироваться" : "Войти"}
+              {isSignUp ? "Sign in" : "Log in"}
             </Button>
           </form>
           <div className="mt-4 text-center">
@@ -134,8 +134,8 @@ const AuthPage = () => {
               className="text-sm text-blue-600 hover:underline"
             >
               {isSignUp 
-                ? "Уже есть аккаунт? Войти" 
-                : "Нет аккаунта? Зарегистрироваться"
+                ? "Already have an account? Log in" 
+                : "No account? Sign in"
               }
             </button>
           </div>
