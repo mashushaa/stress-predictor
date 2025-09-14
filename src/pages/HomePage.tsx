@@ -1,13 +1,31 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Brain, ArrowRight, Heart, Shield } from "lucide-react";
+import { Brain, ArrowRight, Heart, Shield, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import calmBackground from "@/assets/gradient_new.jpg";
 
 const HomePage = () => {
+  const { user, signOut, isLoading } = useAuth();
+
   const handleStartClick = () => {
-    // Use window.location for consistent navigation
-    window.location.href = '/questionnaire';
+    if (!user) {
+      window.location.href = '/auth';
+    } else {
+      window.location.href = '/questionnaire';
+    }
   };
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-soft">
@@ -19,6 +37,23 @@ const HomePage = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent"></div>
         
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <div className="flex justify-between items-center mb-6 w-full">
+            <div></div>
+            {user && (
+              <div className="flex items-center gap-4">
+                <span className="text-white/80">Привет, {user.email}</span>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Выйти
+                </Button>
+              </div>
+            )}
+          </div>
           <div className="flex justify-center mb-6">
             <div className="p-4 bg-white/90 rounded-full shadow-soft">
               <Brain className="w-12 h-12 text-primary" />
@@ -38,7 +73,7 @@ const HomePage = () => {
             size="lg"
             className="bg-gradient-primary hover:shadow-medium transition-all duration-300 transform hover:scale-105 text-lg px-8 py-4 h-auto"
           >
-            Start Questionnaire
+            {user ? 'Начать тестирование' : 'Войти и начать'}
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
@@ -81,7 +116,7 @@ const HomePage = () => {
               </div>
               <h3 className="text-xl font-semibold mb-4 text-foreground">Privacy First</h3>
               <p className="text-muted-foreground">
-                Your responses are processed securely and anonymously. No personal data is stored.
+                Ваши ответы обрабатываются безопасно и сохраняются в защищенной базе данных.
               </p>
             </Card>
           </div>

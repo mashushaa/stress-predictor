@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import QuestionnaireStep from "@/components/QuestionnaireStep";
 import { Field } from "@/components/QuestionnaireSection";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface QuestionnaireData {
   anxiety_level: number;
@@ -30,8 +32,15 @@ export interface QuestionnaireData {
 
 const QuestionnairePage = () => {
   const navigate = useNavigate();
+  const { user, isLoading: authLoading } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth');
+    }
+  }, [user, authLoading, navigate]);
   const [formData, setFormData] = useState<QuestionnaireData>({
     anxiety_level: -1,
     self_esteem: -1,
@@ -124,12 +133,11 @@ const QuestionnairePage = () => {
   };
 
   const handleSubmit = async () => {
+    if (!user) return;
+    
     setIsLoading(true);
 
     try {
-      // Simulate API call for now
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
       // Mock response for demo
       const mockResponse = {
         stress_level: Math.floor(Math.random() * 3),
@@ -140,21 +148,48 @@ const QuestionnairePage = () => {
         ]
       };
 
+      // Save questionnaire response to database
+      const { error } = await supabase
+        .from('questionnaire_responses')
+        .insert({
+          user_id: user.id,
+          ...formData,
+          stress_level: mockResponse.stress_level,
+          probabilities: mockResponse.probabilities
+        });
+
+      if (error) throw error;
+
       // Store results in localStorage for the results page
       localStorage.setItem('stressPredictionResults', JSON.stringify(mockResponse));
       
+      toast({
+        title: "Успешно",
+        description: "Ваши ответы сохранены",
+      });
+
       // Use window.location instead of navigate to avoid router issues
       window.location.href = '/results';
-    } catch (error) {
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "Failed to process your assessment. Please try again.",
+        title: "Ошибка",
+        description: "Не удалось сохранить ответы. Попробуйте снова.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   const currentSection = sections[currentStep - 1];
 
