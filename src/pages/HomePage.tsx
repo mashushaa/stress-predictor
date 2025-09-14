@@ -29,6 +29,24 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-soft">
+      {/* User Info in Top Right Corner */}
+      {user && (
+        <div className="fixed top-4 right-4 z-50 flex flex-col items-end gap-2">
+          <div className="text-white/90 bg-black/20 backdrop-blur-sm px-4 py-2 rounded-lg">
+            Привет, {user.email}
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleSignOut}
+            className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Выйти
+          </Button>
+        </div>
+      )}
+
       {/* Hero Section */}
       <div 
         className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat"
@@ -37,23 +55,6 @@ const HomePage = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent"></div>
         
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-6 w-full">
-            <div></div>
-            {user && (
-              <div className="flex items-center gap-4">
-                <span className="text-white/80">Привет, {user.email}</span>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleSignOut}
-                  className="bg-white/10 text-white border-white/20 hover:bg-white/20"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Выйти
-                </Button>
-              </div>
-            )}
-          </div>
           <div className="flex justify-center mb-6">
             <div className="p-4 bg-white/90 rounded-full shadow-soft">
               <Brain className="w-12 h-12 text-primary" />
