@@ -31,15 +31,15 @@ const HomePage = () => {
     <div className="min-h-screen bg-gradient-soft">
       {/* User Info in Top Right Corner */}
       {user && (
-        <div className="fixed top-4 right-4 z-50 flex flex-col items-end gap-2">
-          <div className="text-white/90 bg-black/20 backdrop-blur-sm px-4 py-2 rounded-lg">
+        <div className="absolute top-6 right-6 z-50 flex flex-col items-end gap-3">
+          <div className="text-white text-sm font-medium bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 shadow-lg">
             Привет, {user.email}
           </div>
           <Button 
             variant="outline" 
             size="sm"
             onClick={handleSignOut}
-            className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+            className="bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm shadow-lg"
           >
             <LogOut className="h-4 w-4 mr-2" />
             Выйти
