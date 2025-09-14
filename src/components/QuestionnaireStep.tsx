@@ -33,40 +33,14 @@ const QuestionnaireStep = ({
 }: QuestionnaireStepProps) => {
   // Calculate progress based on completed fields across all steps
   const totalFields = 20; // Total number of fields across all steps
-  const completedFields = Object.values(formData).filter((value, index) => {
-    // Check if field has been modified from default values
-    const defaultValues = [0, 15, 0, 0, 0, 2, 3, 0, 2, 3, 4, 4, 3, 3, 3, 2, 3, 2, 2, 0];
-    return value !== defaultValues[index];
-  }).length;
+  const completedFields = Object.values(formData).filter(value => value !== -1).length;
   
   const progress = (completedFields / totalFields) * 100;
 
   // Check if current step fields are completed
   const isStepComplete = fields.every(field => {
     const value = formData[field.key];
-    const defaultValues: Record<string, number> = {
-      anxiety_level: 0,
-      self_esteem: 15,
-      mental_health_history: 0,
-      depression: 0,
-      headache: 0,
-      blood_pressure: 2,
-      sleep_quality: 3,
-      breathing_problem: 0,
-      noise_level: 2,
-      living_conditions: 3,
-      safety: 4,
-      basic_needs: 4,
-      academic_performance: 3,
-      study_load: 3,
-      teacher_student_relationship: 3,
-      future_career_concerns: 2,
-      social_support: 3,
-      peer_pressure: 2,
-      extracurricular_activities: 2,
-      bullying: 0,
-    };
-    return value !== defaultValues[field.key];
+    return value !== -1;
   });
 
   const isLastStep = stepNumber === totalSteps;

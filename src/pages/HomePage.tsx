@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Brain, ArrowRight, Heart, Shield } from "lucide-react";
-import cloudBackground from "@/assets/cloud-background.png";
+import calmBackground from "@/assets/calm-blue-background.jpg";
 
 const HomePage = () => {
   const handleStartClick = () => {
@@ -14,7 +14,7 @@ const HomePage = () => {
       {/* Hero Section */}
       <div 
         className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${cloudBackground})` }}
+        style={{ backgroundImage: `url(${calmBackground})` }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent"></div>
         
