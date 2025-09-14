@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Brain, ArrowRight, Heart, Shield } from "lucide-react";
-import calmBackground from "@/assets/calm-blue-background.jpg";
+import calmBackground from "@/assets/gradient_new.jpg";
 
 const HomePage = () => {
   const handleStartClick = () => {
