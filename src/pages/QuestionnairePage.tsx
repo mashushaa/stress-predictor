@@ -68,50 +68,50 @@ const QuestionnairePage = () => {
     {
       title: "Psychological Factors",
       fields: [
-        { key: 'anxiety_level', label: 'Anxiety Level', min: 0, max: 21, step: 1 },
-        { key: 'self_esteem', label: 'Self Esteem', min: 0, max: 30, step: 1 },
-        { key: 'mental_health_history', label: 'Mental Health History', type: 'radio' as const },
-        { key: 'depression', label: 'Depression', min: 0, max: 27, step: 1 }
+        { key: 'anxiety_level', label: 'Rate your anxiety level over the past week: (0 = No anxiety, 21 = Severe anxiety)', min: 0, max: 21, step: 1 },
+        { key: 'self_esteem', label: 'How confident do you feel about yourself and your abilities? (0 = Very low self-esteem, 30 = Very high self-esteem)', min: 0, max: 30, step: 1 },
+        { key: 'mental_health_history', label: 'Have you ever been diagnosed with a mental health condition?', type: 'radio' as const },
+        { key: 'depression', label: 'Rate your depression level over the past two weeks: (0 = No depression, 27 = Severe depression)', min: 0, max: 27, step: 1 }
       ]
     },
     {
       title: "Physiological Factors", 
       fields: [
-        { key: 'headache', label: 'Headache', min: 0, max: 5, step: 1 },
-        { key: 'blood_pressure', label: 'Blood Pressure', type: 'dropdown' as const, options: [
+        { key: 'headache', label: 'Rate the frequency of your headaches: (0 = Never, 5 = Daily)', min: 0, max: 5, step: 1 },
+        { key: 'blood_pressure', label: 'What is your typical blood pressure level?', type: 'dropdown' as const, options: [
           { value: 1, label: 'Low' },
           { value: 2, label: 'Normal' },
           { value: 3, label: 'High' }
         ]},
-        { key: 'sleep_quality', label: 'Sleep Quality', min: 0, max: 5, step: 1 },
-        { key: 'breathing_problem', label: 'Breathing Problem', min: 0, max: 5, step: 1 }
+        { key: 'sleep_quality', label: 'Rate your sleep quality: (1 = Very poor, 2 = Poor, 3 = Fair, 4 = Good, 5 = Excellent)', min: 0, max: 5, step: 1 },
+        { key: 'breathing_problem', label: 'Rate your breathing comfort during daily activities: (1 = Very difficult, 2 = Difficult, 3 = Neutral, 4 = Easy, 5 = Very easy)', min: 0, max: 5, step: 1 }
       ]
     },
     {
       title: "Environmental Factors",
       fields: [
-        { key: 'noise_level', label: 'Noise Level', min: 0, max: 5, step: 1 },
-        { key: 'living_conditions', label: 'Living Conditions', min: 0, max: 5, step: 1 },
-        { key: 'safety', label: 'Safety', min: 0, max: 5, step: 1 },
-        { key: 'basic_needs', label: 'Basic Needs', min: 0, max: 5, step: 1 }
+        { key: 'noise_level', label: 'Rate the noise level in your living/study environment: (1 = Very quiet, 2 = Quiet, 3 = Moderate, 4 = Loud, 5 = Very loud)', min: 0, max: 5, step: 1 },
+        { key: 'living_conditions', label: 'Rate your overall living conditions: (1 = Very poor, 2 = Poor, 3 = Fair, 4 = Good, 5 = Excellent)', min: 0, max: 5, step: 1 },
+        { key: 'safety', label: 'How safe do you feel in your living environment? (1 = Very unsafe, 2 = Unsafe, 3 = Neutral, 4 = Safe, 5 = Very safe)', min: 0, max: 5, step: 1 },
+        { key: 'basic_needs', label: 'How often do you worry about meeting your basic needs? (0 = Never, 5 = Always', min: 0, max: 5, step: 1 }
       ]
     },
     {
       title: "Academic Factors",
       fields: [
-        { key: 'academic_performance', label: 'Academic Performance', min: 0, max: 5, step: 1 },
-        { key: 'study_load', label: 'Study Load', min: 0, max: 5, step: 1 },
-        { key: 'teacher_student_relationship', label: 'Teacher-Student Relationship', min: 0, max: 5, step: 1 },
-        { key: 'future_career_concerns', label: 'Future Career Concerns', min: 0, max: 5, step: 1 }
+        { key: 'academic_performance', label: 'Rate your current academic performance: (1 = Very poor, 2 = Poor, 3 = Average, 4 = Good, 5 = Excellent)', min: 0, max: 5, step: 1 },
+        { key: 'study_load', label: 'How would you rate your current study workload? (1 = Very light, 2 = Light, 3 = Moderate, 4 = Heavy, 5 = Overwhelming)', min: 0, max: 5, step: 1 },
+        { key: 'teacher_student_relationship', label: 'Rate your relationship with your teachers: (1 = Very poor, 2 = Poor, 3 = Fair, 4 = Good, 5 = Excellent)', min: 0, max: 5, step: 1 },
+        { key: 'future_career_concerns', label: 'How worried are you about your future career prospects? (1 = Not worried at all, 2 = Slightly worried, 3 = Moderately worried, 4 = Very worried, 5 = Extremely worried)', min: 0, max: 5, step: 1 }
       ]
     },
     {
       title: "Social Factors",
       fields: [
-        { key: 'social_support', label: 'Social Support', min: 0, max: 5, step: 1 },
-        { key: 'peer_pressure', label: 'Peer Pressure', min: 0, max: 5, step: 1 },
-        { key: 'extracurricular_activities', label: 'Extracurricular Activities', min: 0, max: 5, step: 1 },
-        { key: 'bullying', label: 'Bullying', min: 0, max: 5, step: 1 }
+        { key: 'social_support', label: 'Rate the level of social support you receive: (1 = Very low, 2 = Low, 3 = Moderate, 4 = High, 5 = Very high)', min: 0, max: 5, step: 1 },
+        { key: 'peer_pressure', label: 'Rate the intensity of peer pressure you feel: (1 = None, 2 = Minimal, 3 = Moderate, 4 = High, 5 = Extreme)', min: 0, max: 5, step: 1 },
+        { key: 'extracurricular_activities', label: 'Rate your satisfaction with your extracurricular involvement: (1 = Very dissatisfied, 2 = Dissatisfied, 3 = Neutral, 4 = Satisfied, 5 = Very satisfied)', min: 0, max: 5, step: 1 },
+        { key: 'bullying', label: 'Have you experienced bullying in the past 6 months? (0 = Never, 5 = Constantly)', min: 0, max: 5, step: 1 }
       ]
     }
   ];
