@@ -26,8 +26,15 @@ ChartJS.register(
 );
 
 interface PredictionResults {
-  stress_level: number;
-  probabilities: number[];
+  stressLevel: string;
+  stressClass: number;
+  recommendations: string;
+  confidence: number;
+  probabilities: {
+    no_stress: number;
+    positive_stress: number;
+    negative_stress: number;
+  };
 }
 
 const ResultsPage = () => {
@@ -53,54 +60,18 @@ const ResultsPage = () => {
     );
   }
 
-  const stressLabels = ['Low Stress', 'Medium Stress', 'High Stress'];
+  const stressLabels = ['Отсутствие стресса', 'Позитивный стресс', 'Негативный стресс'];
   const stressColors = ['hsl(var(--success))', 'hsl(var(--warning))', 'hsl(var(--destructive))'];
-  const currentStressLevel = results.stress_level;
-  const currentStressLabel = stressLabels[currentStressLevel];
+  const currentStressLevel = results.stressClass;
+  const currentStressLabel = results.stressLevel;
   const currentStressColor = stressColors[currentStressLevel];
-
-  const recommendations = {
-    0: {
-      title: "Great job maintaining low stress!",
-      description: "Your stress level is low. Maintain a balanced lifestyle with regular exercise and hobbies.",
-      tips: [
-        "Continue your current stress management practices",
-        "Maintain regular exercise and physical activity",
-        "Keep pursuing hobbies and interests you enjoy",
-        "Stay connected with friends and family",
-        "Practice preventive self-care techniques"
-      ]
-    },
-    1: {
-      title: "Moderate stress detected",
-      description: "Moderate stress detected. Try mindfulness techniques, time management, or talking to friends.",
-      tips: [
-        "Practice mindfulness and meditation techniques",
-        "Improve your time management skills",
-        "Talk to trusted friends or family members",
-        "Consider establishing a regular sleep schedule",
-        "Try relaxation techniques like deep breathing"
-      ]
-    },
-    2: {
-      title: "High stress level identified",
-      description: "High stress detected. Seek support from a counselor, prioritize rest, and consider professional help.",
-      tips: [
-        "Consider reaching out to a mental health professional",
-        "Prioritize rest and adequate sleep",
-        "Connect with campus counseling services",
-        "Practice stress-reduction techniques daily",
-        "Don't hesitate to seek support from trusted individuals"
-      ]
-    }
-  };
 
   const chartData = {
     labels: stressLabels,
     datasets: [
       {
-        label: 'Probability',
-        data: results.probabilities.map(p => (p * 100).toFixed(1)),
+        label: 'Вероятность',
+        data: [results.probabilities.no_stress, results.probabilities.positive_stress, results.probabilities.negative_stress],
         backgroundColor: stressColors.map(color => color + '80'),
         borderColor: stressColors,
         borderWidth: 2,
@@ -117,7 +88,7 @@ const ResultsPage = () => {
       },
       title: {
         display: true,
-        text: 'Stress Level Probabilities',
+        text: 'Распределение вероятностей стресса',
         font: {
           size: 16,
           weight: 'bold' as const,
@@ -137,18 +108,17 @@ const ResultsPage = () => {
     },
   };
 
-  const currentRecommendation = recommendations[currentStressLevel as keyof typeof recommendations];
-  const confidencePercentage = (results.probabilities[currentStressLevel] * 100).toFixed(1);
+  const confidencePercentage = results.confidence;
 
   return (
     <div className="min-h-screen bg-gradient-soft py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-            Your Stress Assessment Results
+            Результаты анализа стресса
           </h1>
           <p className="text-lg text-muted-foreground">
-            Based on your responses, here's what we found
+            На основе ваших ответов мы получили следующие результаты
           </p>
         </div>
 
@@ -165,7 +135,7 @@ const ResultsPage = () => {
                 </div>
               </div>
               <CardTitle className="text-2xl text-foreground">
-                Predicted Stress Level
+                Прогноз уровня стресса
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center">
@@ -179,10 +149,10 @@ const ResultsPage = () => {
                 {currentStressLabel}
               </Badge>
               <p className="text-muted-foreground mb-4">
-                Confidence: {confidencePercentage}%
+                Уверенность: {confidencePercentage}%
               </p>
               <Progress 
-                value={parseFloat(confidencePercentage)} 
+                value={confidencePercentage} 
                 className="w-full max-w-xs mx-auto h-3"
               />
             </CardContent>
@@ -193,7 +163,7 @@ const ResultsPage = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <TrendingUp className="w-5 h-5" />
-                Probability Breakdown
+                Распределение вероятностей
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -203,28 +173,17 @@ const ResultsPage = () => {
             </CardContent>
           </Card>
 
-          {/* Recommendations */}
+          {/* Personalized Recommendations */}
           <Card className="bg-gradient-card shadow-soft border-0">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <Heart className="w-5 h-5" />
-                {currentRecommendation.title}
+                Персональные рекомендации
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-6">
-                {currentRecommendation.description}
-              </p>
-              <div className="space-y-3">
-                <h4 className="font-semibold text-foreground">Recommended Actions:</h4>
-                <ul className="space-y-2">
-                  {currentRecommendation.tips.map((tip, index) => (
-                    <li key={index} className="flex items-start gap-2 text-muted-foreground">
-                      <span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-                      {tip}
-                    </li>
-                  ))}
-                </ul>
+              <div className="prose prose-sm max-w-none text-muted-foreground whitespace-pre-line">
+                {results.recommendations}
               </div>
             </CardContent>
           </Card>
@@ -238,7 +197,7 @@ const ResultsPage = () => {
               className="flex items-center gap-2"
             >
               <RefreshCw className="w-5 h-5" />
-              Retake Questionnaire
+              Пройти тест заново
             </Button>
             <Button
               onClick={() => window.location.href = '/'}
@@ -246,7 +205,7 @@ const ResultsPage = () => {
               className="bg-gradient-primary hover:shadow-medium transition-all duration-300 flex items-center gap-2"
             >
               <ArrowLeft className="w-5 h-5" />
-              Back to Home
+              На главную
             </Button>
           </div>
         </div>

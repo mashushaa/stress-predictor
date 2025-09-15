@@ -138,42 +138,37 @@ const QuestionnairePage = () => {
     setIsLoading(true);
 
     try {
-      // Mock response for demo
-      const mockResponse = {
-        stress_level: Math.floor(Math.random() * 3),
-        probabilities: [
-          Math.random() * 0.4,
-          Math.random() * 0.6,
-          Math.random() * 0.4
-        ]
-      };
-
-      // Save questionnaire response to database
-      const { error } = await supabase
-        .from('questionnaire_responses')
-        .insert({
-          user_id: user.id,
-          ...formData,
-          stress_level: mockResponse.stress_level,
-          probabilities: mockResponse.probabilities
-        });
-
-      if (error) throw error;
-
-      // Store results in localStorage for the results page
-      localStorage.setItem('stressPredictionResults', JSON.stringify(mockResponse));
-      
-      toast({
-        title: "Successful",
-        description: "Your answers are saved",
+      // Call the stress prediction edge function
+      const { data, error } = await supabase.functions.invoke('predict-stress', {
+        body: {
+          questionnaireData: formData,
+          userId: user.id
+        }
       });
 
-      // Use window.location instead of navigate to avoid router issues
-      window.location.href = '/results';
-    } catch (error: any) {
+      if (error) {
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error('Не удалось получить результаты предсказания');
+      }
+
+      // Store results in localStorage for the results page
+      localStorage.setItem('stressPredictionResults', JSON.stringify(data));
+      
       toast({
-        title: "Error",
-        description: "It was not possible to save the answers. Try it again.",
+        title: "Успешно",
+        description: "Ваши ответы обработаны и сохранены",
+      });
+
+      // Navigate to results page
+      navigate('/results');
+    } catch (error: any) {
+      console.error('Error submitting questionnaire:', error);
+      toast({
+        title: "Ошибка",
+        description: error.message || "Не удалось обработать ответы. Попробуйте снова.",
         variant: "destructive",
       });
     } finally {
