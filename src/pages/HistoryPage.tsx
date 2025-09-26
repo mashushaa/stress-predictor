@@ -18,7 +18,7 @@ import {
   Filler
 } from 'chart.js';
 import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 ChartJS.register(
   CategoryScale,
@@ -77,10 +77,10 @@ const HistoryPage = () => {
 
   const getStressLabel = (stressClass: number) => {
     switch (stressClass) {
-      case 0: return { label: "Отсутствие стресса", color: "bg-green-500" };
-      case 1: return { label: "Позитивный стресс", color: "bg-yellow-500" };
-      case 2: return { label: "Негативный стресс", color: "bg-red-500" };
-      default: return { label: "Неизвестно", color: "bg-gray-500" };
+      case 0: return { label: "No Stress", color: "bg-green-500" };
+      case 1: return { label: "Positive Stress", color: "bg-yellow-500" };
+      case 2: return { label: "Negative Stress", color: "bg-red-500" };
+      default: return { label: "Unknown", color: "bg-gray-500" };
     }
   };
 
@@ -91,11 +91,11 @@ const HistoryPage = () => {
 
     return {
       labels: chartHistory.map(item => 
-        format(new Date(item.created_at), 'dd.MM.yyyy', { locale: ru })
+        format(new Date(item.created_at), 'dd.MM.yyyy', { locale: enUS })
       ),
       datasets: [
         {
-          label: 'Уровень стресса',
+          label: 'Stress Level',
           data: chartHistory.map(item => item.probabilities?.predicted_class ?? 0),
           borderColor: 'rgb(59, 130, 246)',
           backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -125,7 +125,7 @@ const HistoryPage = () => {
           label: (context: any) => {
             const stressClass = context.parsed.y;
             const { label } = getStressLabel(stressClass);
-            return `Уровень стресса: ${label}`;
+            return `Stress Level: ${label}`;
           }
         }
       }
@@ -165,7 +165,7 @@ const HistoryPage = () => {
         positive_stress: result.probabilities?.positive_stress ?? 0,
         negative_stress: result.probabilities?.negative_stress ?? 0
       },
-      recommendations: "Исторический результат - рекомендации недоступны"
+      recommendations: "Historical result - recommendations not available"
     };
 
     localStorage.setItem('predictionResults', JSON.stringify(resultData));
@@ -188,107 +188,155 @@ const HistoryPage = () => {
   const chartData = getChartData();
 
   return (
-    <div className="min-h-screen bg-gradient-soft p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => window.location.href = '/'}
-              className="bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Главная
-            </Button>
-            <h1 className="text-3xl font-bold text-white">История результатов</h1>
-          </div>
-        </div>
-
-        {history.length === 0 ? (
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-            <CardContent className="p-8 text-center">
-              <p className="text-white text-lg">У вас пока нет результатов тестирования</p>
+    <div className="min-h-screen bg-gradient-soft">
+      {/* Header */}
+      <div className="py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
               <Button 
-                onClick={() => window.location.href = '/questionnaire'}
-                className="mt-4 bg-gradient-primary hover:shadow-medium"
+                variant="outline" 
+                size="sm"
+                onClick={() => window.location.href = '/'}
+                className="bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm"
               >
-                Пройти тест
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Home
               </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-8">
-            {/* Chart */}
-            {chartData && (
+              <h1 className="text-3xl font-bold text-white">Results History</h1>
+            </div>
+          </div>
+
+          {history.length === 0 ? (
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardContent className="p-8 text-center">
+                <p className="text-white text-lg">You don't have any test results yet</p>
+                <Button 
+                  onClick={() => window.location.href = '/questionnaire'}
+                  className="mt-4 bg-gradient-primary hover:shadow-medium"
+                >
+                  Take Test
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-8">
+              {/* Chart */}
+              {chartData && (
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5" />
+                      Stress Level Dynamics
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-white/90 p-4 rounded-lg">
+                      <div className="h-48">
+                        <Line data={chartData} options={chartOptions} />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* History List */}
               <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5" />
-                    Динамика уровня стресса
+                    <Calendar className="h-5 w-5" />
+                    Test History ({history.length})
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="bg-white/90 p-4 rounded-lg">
-                    <Line data={chartData} options={chartOptions} />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* History List */}
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  История прохождений ({history.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {history.map((result) => {
-                  const stressInfo = getStressLabel(result.probabilities?.predicted_class ?? 0);
-                  return (
-                    <div 
-                      key={result.id}
-                      className="bg-white/20 backdrop-blur-sm p-4 rounded-lg border border-white/30 hover:bg-white/30 transition-all"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="text-white">
-                            <div className="font-medium">
-                              {format(new Date(result.created_at), 'dd MMMM yyyy, HH:mm', { locale: ru })}
-                            </div>
-                            <div className="text-sm text-white/70 mt-1">
-                              Результат тестирования
+                <CardContent className="space-y-4">
+                  {history.map((result) => {
+                    const stressInfo = getStressLabel(result.probabilities?.predicted_class ?? 0);
+                    return (
+                      <div 
+                        key={result.id}
+                        className="bg-white/20 backdrop-blur-sm p-4 rounded-lg border border-white/30 hover:bg-white/30 transition-all"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="text-white">
+                              <div className="font-medium">
+                                {format(new Date(result.created_at), 'dd MMMM yyyy, HH:mm', { locale: enUS })}
+                              </div>
+                              <div className="text-sm text-white/70 mt-1">
+                                Test Result
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-4">
-                          <Badge 
-                            className={`${stressInfo.color} text-white border-0`}
-                          >
-                            {stressInfo.label}
-                          </Badge>
                           
-                          <Button
-                            size="sm"
-                            onClick={() => viewResult(result)}
-                            className="bg-gradient-primary hover:shadow-medium"
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            Просмотреть
-                          </Button>
+                          <div className="flex items-center gap-4">
+                            <Badge 
+                              className={`${stressInfo.color} text-white border-0`}
+                            >
+                              {stressInfo.label}
+                            </Badge>
+                            
+                            <Button
+                              size="sm"
+                              onClick={() => viewResult(result)}
+                              className="bg-gradient-primary hover:shadow-medium"
+                            >
+                              <Eye className="h-4 w-4 mr-2" />
+                              View
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </CardContent>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Features Section Background */}
+      <div className="py-20 px-4 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-foreground">
+            Track Your Mental Health Journey
+          </h2>
+          <p className="text-xl text-muted-foreground text-center mb-16 max-w-2xl mx-auto">
+            Monitor your stress levels over time and see how your wellbeing evolves with our comprehensive tracking system.
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="p-8 text-center bg-gradient-card shadow-soft border-0 hover:shadow-medium transition-all duration-300">
+              <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                <TrendingUp className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4 text-foreground">Progress Tracking</h3>
+              <p className="text-muted-foreground">
+                Visualize your stress level changes over time with detailed charts and trend analysis.
+              </p>
+            </Card>
+            
+            <Card className="p-8 text-center bg-gradient-card shadow-soft border-0 hover:shadow-medium transition-all duration-300">
+              <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                <Calendar className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4 text-foreground">Historical Data</h3>
+              <p className="text-muted-foreground">
+                Access all your previous assessments and compare results to understand your patterns.
+              </p>
+            </Card>
+            
+            <Card className="p-8 text-center bg-gradient-card shadow-soft border-0 hover:shadow-medium transition-all duration-300">
+              <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                <Eye className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4 text-foreground">Detailed Insights</h3>
+              <p className="text-muted-foreground">
+                Review specific test results and recommendations to better understand your mental health.
+              </p>
             </Card>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

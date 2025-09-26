@@ -44,7 +44,7 @@ const UserMenu = () => {
           className="cursor-pointer hover:bg-white/50"
         >
           <History className="h-4 w-4 mr-2" />
-          История результатов
+          History
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem 
@@ -52,7 +52,7 @@ const UserMenu = () => {
           className="cursor-pointer hover:bg-white/50 text-red-600"
         >
           <LogOut className="h-4 w-4 mr-2" />
-          Выйти
+          Sign Out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
