@@ -190,7 +190,7 @@ const HistoryPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="py-8 px-4 bg-gradient-soft">
+      <div className="py-8 px-4 bg-background">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
@@ -198,19 +198,18 @@ const HistoryPage = () => {
                 variant="outline" 
                 size="sm"
                 onClick={() => window.location.href = '/'}
-                className="bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Home
               </Button>
-              <h1 className="text-3xl font-bold text-white">Results History</h1>
+              <h1 className="text-3xl font-bold text-foreground">Results History</h1>
             </div>
           </div>
 
           {history.length === 0 ? (
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+            <Card className="bg-gradient-card shadow-soft border-0">
               <CardContent className="p-8 text-center">
-                <p className="text-white text-lg">You don't have any test results yet</p>
+                <p className="text-muted-foreground text-lg">You don't have any test results yet</p>
                 <Button 
                   onClick={() => window.location.href = '/questionnaire'}
                   className="mt-4 bg-gradient-primary hover:shadow-medium"
@@ -223,15 +222,15 @@ const HistoryPage = () => {
             <div className="space-y-8">
               {/* Chart */}
               {chartData && (
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                <Card className="bg-gradient-card shadow-soft border-0">
                   <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
+                    <CardTitle className="text-foreground flex items-center gap-2">
                       <TrendingUp className="h-5 w-5" />
                       Stress Level Dynamics
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="bg-white/90 p-4 rounded-lg">
+                    <div className="bg-white p-4 rounded-lg">
                       <div className="h-48">
                         <Line data={chartData} options={chartOptions} />
                       </div>
@@ -241,9 +240,9 @@ const HistoryPage = () => {
               )}
 
               {/* History List */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <Card className="bg-gradient-card shadow-soft border-0">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-foreground flex items-center gap-2">
                     <Calendar className="h-5 w-5" />
                     Test History ({history.length})
                   </CardTitle>
@@ -254,15 +253,15 @@ const HistoryPage = () => {
                     return (
                       <div 
                         key={result.id}
-                        className="bg-white/20 backdrop-blur-sm p-4 rounded-lg border border-white/30 hover:bg-white/30 transition-all"
+                        className="bg-white/50 p-4 rounded-lg border border-gray-200 hover:bg-white/70 transition-all"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className="text-white">
+                            <div className="text-foreground">
                               <div className="font-medium">
                                 {format(new Date(result.created_at), 'dd MMMM yyyy, HH:mm', { locale: enUS })}
                               </div>
-                              <div className="text-sm text-white/70 mt-1">
+                              <div className="text-sm text-muted-foreground mt-1">
                                 Test Result
                               </div>
                             </div>
