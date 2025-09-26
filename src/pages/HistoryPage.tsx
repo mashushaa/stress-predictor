@@ -35,6 +35,7 @@ interface HistoryResult {
   id: string;
   created_at: string;
   probabilities: any; // JSON field from database
+  recommendations?: string; // Recommendations from database
   anxiety_level?: number;
   self_esteem?: number;
   sleep_quality?: number;
@@ -165,7 +166,7 @@ const HistoryPage = () => {
         positive_stress: result.probabilities?.positive_stress ?? 0,
         negative_stress: result.probabilities?.negative_stress ?? 0
       },
-      recommendations: result.probabilities?.recommendations || "Recommendations are not available for this result"
+      recommendations: result.recommendations || result.probabilities?.recommendations || "Recommendations are not available for this result"
     };
 
     localStorage.setItem('predictionResults', JSON.stringify(resultData));

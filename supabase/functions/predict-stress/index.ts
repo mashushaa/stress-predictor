@@ -229,7 +229,7 @@ serve(async (req) => {
     
     console.log('Generated recommendations:', recommendations);
 
-    // Сохранение результатов в базу данных (создаем новую запись каждый раз)
+    // Save results to database (create new record each time)
     const { error: saveError } = await supabase
       .from('questionnaire_responses')
       .insert({
@@ -239,9 +239,9 @@ serve(async (req) => {
           no_stress: predictedStressClass === 0 ? 0.8 : 0.1,
           positive_stress: predictedStressClass === 1 ? 0.8 : 0.1,
           negative_stress: predictedStressClass === 2 ? 0.8 : 0.1,
-          predicted_class: predictedStressClass,
-          recommendations: recommendations // Сохраняем рекомендации в базу данных
-        }
+          predicted_class: predictedStressClass
+        },
+        recommendations: recommendations // Save recommendations in separate column
       });
 
     if (saveError) {
@@ -250,9 +250,9 @@ serve(async (req) => {
     }
 
     const stressLabels = {
-      0: "Отсутствие стресса",
-      1: "Позитивный стресс", 
-      2: "Негативный стресс"
+      0: "No Stress",
+      1: "Positive Stress", 
+      2: "Negative Stress"
     };
 
     const result = {

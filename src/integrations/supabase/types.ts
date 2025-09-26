@@ -57,6 +57,7 @@ export type Database = {
           noise_level: number | null
           peer_pressure: number | null
           probabilities: Json | null
+          recommendations: string | null
           safety: number | null
           self_esteem: number | null
           sleep_quality: number | null
@@ -85,6 +86,7 @@ export type Database = {
           noise_level?: number | null
           peer_pressure?: number | null
           probabilities?: Json | null
+          recommendations?: string | null
           safety?: number | null
           self_esteem?: number | null
           sleep_quality?: number | null
@@ -113,6 +115,7 @@ export type Database = {
           noise_level?: number | null
           peer_pressure?: number | null
           probabilities?: Json | null
+          recommendations?: string | null
           safety?: number | null
           self_esteem?: number | null
           sleep_quality?: number | null
