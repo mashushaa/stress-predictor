@@ -67,8 +67,7 @@ function predictStressLevel(data: any): number {
 }
 
 async function generateRecommendations(stressClass: number, questionnaireData: any): Promise<string> {
-  const yandexApiKey = Deno.env.get('YANDEX_GPT_API_KEY');
-  const yandexFolderId = Deno.env.get('YANDEX_FOLDER_ID');
+  const huggingFaceToken = Deno.env.get('HUGGING_FACE_ACCESS_TOKEN');
   
   // Fallback recommendations based on stress class
   const fallbackRecommendations = {
@@ -101,15 +100,9 @@ async function generateRecommendations(stressClass: number, questionnaireData: a
 • Consider temporarily reducing your workload`
   };
 
-  // Пытаемся получить персонализированные рекомендации через YandexGPT
-  if (yandexApiKey && yandexFolderId) {
+  // Try to get personalized recommendations through Hugging Face API with DeepSeek model
+  if (huggingFaceToken) {
     try {
-      const stressLabels = {
-        0: "отсутствие стресса",
-        1: "позитивный стресс", 
-        2: "негативный стресс"
-      };
-
       const systemPrompt = `You are an experienced psychologist specializing in stress management, mental health, and well-being. Your task is to provide empathetic, supportive, and evidence-based recommendations for users based on the predicted stress class and the provided values for factors influencing stress.
 
 Input Format:
@@ -159,47 +152,46 @@ Constraints:
 - Consider the specified ranges when analyzing factors and formulating recommendations
 - Use English for all responses and ensure they are clear, concise, and professional`;
 
-      const response = await fetch('https://llm.api.cloud.yandex.net/foundationModels/v1/completion', {
+      const userPrompt = 'Analyze my data and provide personalized recommendations.';
+
+      const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-large', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${huggingFaceToken}`,
           'Content-Type': 'application/json',
-          'Authorization': `Api-Key ${yandexApiKey}`,
         },
         body: JSON.stringify({
-          modelUri: `gpt://${yandexFolderId}/yandexgpt-lite`,
-          completionOptions: {
-            stream: false,
+          inputs: `${systemPrompt}\n\nUser: ${userPrompt}\nAssistant:`,
+          parameters: {
+            max_length: 1000,
             temperature: 0.7,
-            maxTokens: 1000
-          },
-          messages: [
-            {
-              role: 'system',
-              text: systemPrompt
-            },
-            {
-              role: 'user', 
-              text: 'Analyze my data and provide personalized recommendations.'
-            }
-          ]
+            do_sample: true,
+            top_p: 0.9,
+            return_full_text: false
+          }
         })
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('YandexGPT response success:', data);
-        return data.result.alternatives[0].message.text;
+        console.log('Hugging Face API response success:', data);
+        
+        if (data && data[0] && data[0].generated_text) {
+          return data[0].generated_text.trim();
+        } else {
+          console.log('No generated text in response, using fallback');
+        }
       } else {
         const errorText = await response.text();
-        console.error('YandexGPT API error:', response.status, response.statusText, errorText);
-        console.error('YandexGPT API error, using fallback recommendations');
+        console.error('Hugging Face API error:', response.status, response.statusText, errorText);
+        console.error('Hugging Face API error, using fallback recommendations');
       }
     } catch (error) {
-      console.error('Error calling YandexGPT:', error instanceof Error ? error.message : String(error));
+      console.error('Error calling Hugging Face API:', error instanceof Error ? error.message : String(error));
     }
   }
 
-  // Возвращаем fallback рекомендации
+  // Return fallback recommendations
   return fallbackRecommendations[stressClass as keyof typeof fallbackRecommendations] || fallbackRecommendations[1];
 }
 
