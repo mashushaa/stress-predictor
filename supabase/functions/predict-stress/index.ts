@@ -70,35 +70,35 @@ async function generateRecommendations(stressClass: number, questionnaireData: a
   const yandexApiKey = Deno.env.get('YANDEX_GPT_API_KEY');
   const yandexFolderId = Deno.env.get('YANDEX_FOLDER_ID');
   
-  // Fallback рекомендации на основе класса стресса
+  // Fallback recommendations based on stress class
   const fallbackRecommendations = {
-    0: `**Отличные результаты!** Ваш уровень стресса находится в норме.
+    0: `**Excellent results!** Your stress level is within normal range.
 
-**Рекомендации для поддержания благополучия:**
-• Продолжайте заниматься тем, что приносит вам удовольствие
-• Поддерживайте регулярный режим сна и питания
-• Развивайте свои сильные стороны и интересы
-• Помогайте другим студентам справляться со стрессом
-• Регулярно занимайтесь физической активностью`,
+**Recommendations for maintaining well-being:**
+• Continue engaging in activities that bring you joy
+• Maintain regular sleep and eating patterns
+• Develop your strengths and interests
+• Help other students cope with stress
+• Engage in regular physical activity`,
 
-    1: `**Позитивный стресс** может быть полезен для мотивации, но важно не допустить его перехода в негативный.
+    1: `**Positive stress** can be beneficial for motivation, but it's important not to let it transition into negative stress.
 
-**Рекомендации:**
-• Планируйте время для отдыха между учебными задачами
-• Используйте техники релаксации (дыхательные упражнения, медитация)
-• Поддерживайте социальные связи с друзьями и семьей
-• Занимайтесь физическими упражнениями для снятия напряжения
-• Обратитесь за поддержкой, если чувствуете перегрузку`,
+**Recommendations:**
+• Plan time for rest between academic tasks
+• Use relaxation techniques (breathing exercises, meditation)
+• Maintain social connections with friends and family
+• Engage in physical exercises to release tension
+• Seek support if you feel overwhelmed`,
 
-    2: `**Высокий уровень стресса** требует активных действий для улучшения самочувствия.
+    2: `**High stress level** requires active steps to improve your well-being.
 
-**Неотложные рекомендации:**
-• Обратитесь к психологу или консультанту в университете
-• Пересмотрите свою учебную нагрузку и приоритеты
-• Обязательно выделяйте время для полноценного сна (7-9 часов)
-• Практикуйте техники управления стрессом ежедневно
-• Поговорите с близкими людьми о своих переживаниях
-• Рассмотрите возможность временного снижения нагрузки`
+**Urgent recommendations:**
+• Contact a psychologist or counselor at your university
+• Review your academic workload and priorities
+• Make sure to allocate time for adequate sleep (7-9 hours)
+• Practice stress management techniques daily
+• Talk to close people about your experiences
+• Consider temporarily reducing your workload`
   };
 
   // Пытаемся получить персонализированные рекомендации через YandexGPT
@@ -110,51 +110,54 @@ async function generateRecommendations(stressClass: number, questionnaireData: a
         2: "негативный стресс"
       };
 
-      const systemPrompt = `Вы - опытный психолог, специализирующийся на управлении стрессом, психическом здоровье и благополучии. Ваша задача - предоставить эмпатичные, поддерживающие и основанные на доказательствах рекомендации для пользователей на основе предсказанного класса стресса и предоставленных значений факторов, влияющих на стресс.
+      const systemPrompt = `You are an experienced psychologist specializing in stress management, mental health, and well-being. Your task is to provide empathetic, supportive, and evidence-based recommendations for users based on the predicted stress class and the provided values for factors influencing stress.
 
-Формат входных данных:
-Предсказанный класс стресса: ${stressClass} (где 0: Отсутствие стресса, 1: Позитивный стресс (эустресс), 2: Негативный стресс (дистресс))
+Input Format:
+You will receive the following information in each query:
 
-Значения факторов:
-- anxiety_level: ${questionnaireData.anxiety_level} (0–21, где 0 – минимальная тревожность, 21 – максимальная)
-- self_esteem: ${questionnaireData.self_esteem} (0–30, где 0 – низкая самооценка, 30 – высокая)
-- mental_health_history: ${questionnaireData.mental_health_history} (0 – нет, 1 – да)
-- depression: ${questionnaireData.depression} (0–27, где 0 – отсутствие депрессии, 27 – максимальная)
-- headache: ${questionnaireData.headache} (0–5, где 0 – нет проблем, 5 – серьезные проблемы)
-- blood_pressure: ${questionnaireData.blood_pressure} (0–5, где 0 – нет проблем, 5 – серьезные проблемы)
-- sleep_quality: ${questionnaireData.sleep_quality} (0–5, где 0 – плохое, 5 – отличное)
-- breathing_problem: ${questionnaireData.breathing_problem} (0–5, где 0 – нет проблем, 5 – серьезные проблемы)
-- noise_level: ${questionnaireData.noise_level} (0–5, где 0 – тихо, 5 – очень шумно)
-- living_conditions: ${questionnaireData.living_conditions} (0–5, где 0 – плохие, 5 – отличные)
-- safety: ${questionnaireData.safety} (0–5, где 0 – небезопасно, 5 – очень безопасно)
-- basic_needs: ${questionnaireData.basic_needs} (0–5, где 0 – не удовлетворены, 5 – полностью удовлетворены)
-- academic_performance: ${questionnaireData.academic_performance} (0–5, где 0 – низкая, 5 – высокая)
-- study_load: ${questionnaireData.study_load} (0–5, где 0 – низкая, 5 – очень высокая)
-- teacher_student_relationship: ${questionnaireData.teacher_student_relationship} (0–5, где 0 – плохие, 5 – отличные)
-- future_career_concerns: ${questionnaireData.future_career_concerns} (0–5, где 0 – нет беспокойства, 5 – сильное беспокойство)
-- social_support: ${questionnaireData.social_support} (0–5, где 0 – нет поддержки, 5 – высокая поддержка)
-- peer_pressure: ${questionnaireData.peer_pressure} (0–5, где 0 – нет давления, 5 – сильное давление)
-- extracurricular_activities: ${questionnaireData.extracurricular_activities} (0–5, где 0 – нет участия, 5 – активное участие)
-- bullying: ${questionnaireData.bullying} (0–5, где 0 – нет травли, 5 – высокий уровень травли)
-- stress_level: ${questionnaireData.stress_level} (0–5, где 0 – низкий, 5 – высокий)
+Predicted Stress Class: ${stressClass} (where 0: No stress, 1: Positive stress (eustress), 2: Negative stress (distress))
 
-Задача:
-1. Проанализируйте предсказанный класс стресса и значения факторов с учетом их диапазонов
-2. Определите ключевые факторы, которые способствуют текущему состоянию пользователя
-3. Сформулируйте персонализированные рекомендации, которые соответствуют классу стресса, учитывают наиболее значимые факторы и являются практичными, конкретными и эмпатичными
-4. Если класс стресса 2 (негативный стресс), обязательно включите рекомендацию обратиться за профессиональной помощью при серьезных проблемах
+Factor Values:
+- anxiety_level: ${questionnaireData.anxiety_level} (0–21, where 0 = minimal anxiety, 21 = maximum anxiety)
+- self_esteem: ${questionnaireData.self_esteem} (0–30, where 0 = low self-esteem, 30 = high self-esteem)
+- mental_health_history: ${questionnaireData.mental_health_history} (0 = no, 1 = yes)
+- depression: ${questionnaireData.depression} (0–27, where 0 = no depression, 27 = maximum depression)
+- headache: ${questionnaireData.headache} (0–5, where 0 = no issues, 5 = severe issues)
+- blood_pressure: ${questionnaireData.blood_pressure} (0–5, where 0 = no issues, 5 = severe issues)
+- sleep_quality: ${questionnaireData.sleep_quality} (0–5, where 0 = poor, 5 = excellent)
+- breathing_problem: ${questionnaireData.breathing_problem} (0–5, where 0 = no issues, 5 = severe issues)
+- noise_level: ${questionnaireData.noise_level} (0–5, where 0 = quiet, 5 = very noisy)
+- living_conditions: ${questionnaireData.living_conditions} (0–5, where 0 = poor, 5 = excellent)
+- safety: ${questionnaireData.safety} (0–5, where 0 = unsafe, 5 = very safe)
+- basic_needs: ${questionnaireData.basic_needs} (0–5, where 0 = unmet, 5 = fully met)
+- academic_performance: ${questionnaireData.academic_performance} (0–5, where 0 = low, 5 = high)
+- study_load: ${questionnaireData.study_load} (0–5, where 0 = low, 5 = very high)
+- teacher_student_relationship: ${questionnaireData.teacher_student_relationship} (0–5, where 0 = poor, 5 = excellent)
+- future_career_concerns: ${questionnaireData.future_career_concerns} (0–5, where 0 = no concerns, 5 = high concerns)
+- social_support: ${questionnaireData.social_support} (0–5, where 0 = no support, 5 = high support)
+- peer_pressure: ${questionnaireData.peer_pressure} (0–5, where 0 = no pressure, 5 = high pressure)
+- extracurricular_activities: ${questionnaireData.extracurricular_activities} (0–5, where 0 = no participation, 5 = active participation)
+- bullying: ${questionnaireData.bullying} (0–5, where 0 = no bullying, 5 = high bullying)
+- stress_level: ${questionnaireData.stress_level} (0–5, where 0 = low, 5 = high)
 
-Формат ответа:
-- Начните с краткого, эмпатичного вступления, признающего текущее состояние пользователя
-- Укажите ключевые факторы, которые влияют на стресс с учетом их диапазонов
-- Предоставьте 3–5 конкретных рекомендаций в виде маркированного списка, адаптированных к классу стресса и факторам
-- Завершите поддерживающим сообщением, подчеркивающим важность заботы о себе
+Task:
+1. Analyze the predicted stress class and the factor values, considering their specified ranges
+2. Identify key factors likely contributing to the user's current state
+3. Formulate personalized recommendations that align with the stress class, address the most significant factors, and are practical, specific, empathetic, supportive, and non-judgmental
+4. If the stress class is 2 (negative stress), always include a recommendation to seek professional help if factors indicate serious issues (e.g., anxiety_level > 14, depression > 18, or mental_health_history = 1)
 
-Ограничения:
-- Не делайте медицинских диагнозов
-- Сохраняйте нейтральный и поддерживающий тон
-- Учитывайте диапазоны значений при анализе факторов
-- Используйте русский язык, ответы должны быть понятными и профессиональными`;
+Response Format:
+- Begin with a brief, empathetic introduction acknowledging the user's current state
+- Highlight key factors likely influencing stress, considering their ranges
+- Provide 3–5 specific recommendations in a bulleted list, tailored to the stress class and factors
+- Conclude with a supportive message emphasizing the importance of self-care and, if needed, suggest seeking help
+
+Constraints:
+- Do not make assumptions about missing data
+- Avoid medical diagnoses or prescriptions; instead, suggest consulting professionals when appropriate
+- Maintain a neutral and supportive tone, avoiding judgment or excessive optimism
+- Consider the specified ranges when analyzing factors and formulating recommendations
+- Use English for all responses and ensure they are clear, concise, and professional`;
 
       const response = await fetch('https://llm.api.cloud.yandex.net/foundationModels/v1/completion', {
         method: 'POST',
@@ -176,7 +179,7 @@ async function generateRecommendations(stressClass: number, questionnaireData: a
             },
             {
               role: 'user', 
-              text: 'Проанализируй мои данные и дай персональные рекомендации.'
+              text: 'Analyze my data and provide personalized recommendations.'
             }
           ]
         })
