@@ -155,7 +155,7 @@ const QuestionnairePage = () => {
       }
 
       // Store results in localStorage for the results page
-      localStorage.setItem('stressPredictionResults', JSON.stringify(data));
+      localStorage.setItem('predictionResults', JSON.stringify(data));
       
       toast({
         title: "Успешно",

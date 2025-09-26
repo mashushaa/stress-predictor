@@ -223,10 +223,10 @@ serve(async (req) => {
     
     console.log('Generated recommendations:', recommendations);
 
-    // Сохранение результатов в базу данных
+    // Сохранение результатов в базу данных (создаем новую запись каждый раз)
     const { error: saveError } = await supabase
       .from('questionnaire_responses')
-      .upsert({
+      .insert({
         user_id: userId,
         ...dataWithStressLevel,
         probabilities: {
@@ -234,8 +234,7 @@ serve(async (req) => {
           positive_stress: predictedStressClass === 1 ? 0.8 : 0.1,
           negative_stress: predictedStressClass === 2 ? 0.8 : 0.1,
           predicted_class: predictedStressClass
-        },
-        updated_at: new Date().toISOString()
+        }
       });
 
     if (saveError) {

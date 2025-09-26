@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { RefreshCw, ArrowLeft, TrendingUp, Heart, Brain } from "lucide-react";
+import { RefreshCw, ArrowLeft, TrendingUp, Heart, Brain, History } from "lucide-react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -39,10 +39,12 @@ interface PredictionResults {
 
 const ResultsPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [results, setResults] = useState<PredictionResults | null>(null);
+  const isFromHistory = searchParams.get('from') === 'history';
 
   useEffect(() => {
-    const storedResults = localStorage.getItem('stressPredictionResults');
+    const storedResults = localStorage.getItem('predictionResults');
     if (storedResults) {
       setResults(JSON.parse(storedResults));
     } else {
@@ -190,15 +192,27 @@ const ResultsPage = () => {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              onClick={() => window.location.href = '/questionnaire'}
-              variant="outline"
-              size="lg"
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className="w-5 h-5" />
-              Пройти тест заново
-            </Button>
+            {isFromHistory ? (
+              <Button
+                onClick={() => window.location.href = '/history'}
+                variant="outline"
+                size="lg"
+                className="flex items-center gap-2"
+              >
+                <History className="w-5 h-5" />
+                Назад к истории
+              </Button>
+            ) : (
+              <Button
+                onClick={() => window.location.href = '/questionnaire'}
+                variant="outline"
+                size="lg"
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className="w-5 h-5" />
+                Пройти тест заново
+              </Button>
+            )}
             <Button
               onClick={() => window.location.href = '/'}
               size="lg"

@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Brain, ArrowRight, Heart, Shield, LogOut } from "lucide-react";
+import { Brain, ArrowRight, Heart, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import UserMenu from "@/components/UserMenu";
 import calmBackground from "@/assets/gradient_new.jpg";
 
 const HomePage = () => {
-  const { user, signOut, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
 
   const handleStartClick = () => {
     if (!user) {
@@ -13,10 +14,6 @@ const HomePage = () => {
     } else {
       window.location.href = '/questionnaire';
     }
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
   };
 
   if (isLoading) {
@@ -29,21 +26,10 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-soft">
-      {/* User Info in Top Right Corner */}
+      {/* User Menu in Top Right Corner */}
       {user && (
-        <div className="absolute top-6 right-6 z-50 flex flex-col items-end gap-3">
-          <div className="text-white text-sm font-medium bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 shadow-lg">
-            Hi, {user.email}
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleSignOut}
-            className="bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm shadow-lg"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Exit
-          </Button>
+        <div className="absolute top-6 right-6 z-50">
+          <UserMenu />
         </div>
       )}
 
