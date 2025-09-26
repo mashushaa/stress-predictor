@@ -63,7 +63,7 @@ const ResultsPage = () => {
     );
   }
 
-  const stressLabels = ['Отсутствие стресса', 'Позитивный стресс', 'Негативный стресс'];
+  const stressLabels = ['No Stress', 'Positive Stress', 'Negative Stress'];
   const stressColors = ['hsl(var(--success))', 'hsl(var(--warning))', 'hsl(var(--destructive))'];
   const currentStressLevel = results.stressClass;
   const currentStressLabel = results.stressLevel;
@@ -73,7 +73,7 @@ const ResultsPage = () => {
     labels: stressLabels,
     datasets: [
       {
-        label: 'Вероятность',
+        label: 'Probability',
         data: [results.probabilities.no_stress, results.probabilities.positive_stress, results.probabilities.negative_stress],
         backgroundColor: stressColors.map(color => color + '80'),
         borderColor: stressColors,
@@ -91,7 +91,7 @@ const ResultsPage = () => {
       },
       title: {
         display: true,
-        text: 'Распределение вероятностей стресса',
+        text: 'Stress Probability Distribution',
         font: {
           size: 16,
           weight: 'bold' as const,
@@ -118,10 +118,10 @@ const ResultsPage = () => {
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-            Результаты анализа стресса
+            Stress Analysis Results
           </h1>
           <p className="text-lg text-muted-foreground">
-            На основе ваших ответов мы получили следующие результаты
+            Based on your responses, we obtained the following results
           </p>
         </div>
 
@@ -138,7 +138,7 @@ const ResultsPage = () => {
                 </div>
               </div>
               <CardTitle className="text-2xl text-foreground">
-                Прогноз уровня стресса
+                Stress Level Prediction
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center">
@@ -152,7 +152,7 @@ const ResultsPage = () => {
                 {currentStressLabel}
               </Badge>
               <p className="text-muted-foreground mb-4">
-                Уверенность: {confidencePercentage}%
+                Confidence: {confidencePercentage}%
               </p>
               <Progress 
                 value={confidencePercentage} 
@@ -166,7 +166,7 @@ const ResultsPage = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <TrendingUp className="w-5 h-5" />
-                Распределение вероятностей
+                Probability Distribution
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -181,7 +181,7 @@ const ResultsPage = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <Heart className="w-5 h-5" />
-                Персональные рекомендации
+                Personalized Recommendations
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -202,7 +202,7 @@ const ResultsPage = () => {
                 className="flex items-center gap-2"
               >
                 <History className="w-5 h-5" />
-                Назад к истории
+                Back to History
               </Button>
             ) : (
               <Button
@@ -212,7 +212,7 @@ const ResultsPage = () => {
                 className="flex items-center gap-2"
               >
                 <RefreshCw className="w-5 h-5" />
-                Пройти тест заново
+                Retake Test
               </Button>
             )}
             <Button
@@ -221,7 +221,7 @@ const ResultsPage = () => {
               className="bg-gradient-primary hover:shadow-medium transition-all duration-300 flex items-center gap-2"
             >
               <ArrowLeft className="w-5 h-5" />
-              На главную
+              Home
             </Button>
           </div>
         </div>
