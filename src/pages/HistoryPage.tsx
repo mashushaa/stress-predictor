@@ -188,9 +188,9 @@ const HistoryPage = () => {
   const chartData = getChartData();
 
   return (
-    <div className="min-h-screen bg-gradient-soft">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="py-8 px-4">
+      <div className="py-8 px-4 bg-gradient-soft">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
