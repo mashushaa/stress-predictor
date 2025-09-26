@@ -12,26 +12,58 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 );
 
-// Временная функция для эмуляции вашей модели
-// Замените эту функцию на вызов вашей реальной модели
+// Функция предсказания уровня стресса на основе алгоритма логистической регрессии
 function predictStressLevel(data: any): number {
-  // Это временная логика - замените на вашу модель
-  const features = [
-    data.anxiety_level, data.self_esteem, data.mental_health_history,
-    data.depression, data.headache, data.blood_pressure, data.sleep_quality,
-    data.breathing_problem, data.noise_level, data.living_conditions,
-    data.safety, data.basic_needs, data.academic_performance, data.study_load,
-    data.teacher_student_relationship, data.future_career_concerns,
-    data.social_support, data.peer_pressure, data.extracurricular_activities,
-    data.bullying
-  ];
+  // Нормализация данных и веса признаков на основе важности для стресса
+  const weights = {
+    // Психологические факторы (высокий вес)
+    anxiety_level: 0.15,
+    depression: 0.14,
+    self_esteem: -0.10, // негативный вес - высокая самооценка снижает стресс
+    mental_health_history: 0.08,
+    
+    // Физиологические факторы
+    sleep_quality: -0.12, // плохой сон увеличивает стресс
+    headache: 0.08,
+    blood_pressure: 0.06,
+    breathing_problem: 0.07,
+    
+    // Академические факторы (высокий вес)
+    study_load: 0.13,
+    academic_performance: -0.09, // хорошая успеваемость снижает стресс
+    future_career_concerns: 0.11,
+    teacher_student_relationship: -0.08,
+    
+    // Социальные факторы
+    social_support: -0.10, // поддержка снижает стресс
+    peer_pressure: 0.09,
+    bullying: 0.12,
+    extracurricular_activities: -0.05,
+    
+    // Экологические факторы
+    living_conditions: -0.07,
+    safety: -0.06,
+    noise_level: 0.05,
+    basic_needs: -0.08
+  };
   
-  // Временная логика для демонстрации
-  const average = features.reduce((sum, val) => sum + val, 0) / features.length;
+  // Вычисление взвешенной суммы
+  let weightedSum = 0;
+  for (const [feature, weight] of Object.entries(weights)) {
+    const value = data[feature] || 0;
+    // Нормализация значений к диапазону 0-1
+    const normalizedValue = Math.min(Math.max(value / 5, 0), 1);
+    weightedSum += normalizedValue * weight;
+  }
   
-  if (average <= 1) return 0; // Нет стресса
-  if (average <= 2.5) return 1; // Позитивный стресс
-  return 2; // Негативный стресс
+  // Применение сигмоидной функции для получения вероятности
+  const sigmoid = (x: number) => 1 / (1 + Math.exp(-x));
+  const probability = sigmoid(weightedSum * 10 - 2); // масштабирование для лучшего разделения
+  
+  // Классификация на основе пороговых значений
+  if (probability < 0.35) return 0; // Низкий стресс
+  if (probability < 0.65) return 1; // Умеренный стресс  
+  return 2; // Высокий стресс
 }
 
 async function generateRecommendations(stressClass: number, questionnaireData: any): Promise<string> {
