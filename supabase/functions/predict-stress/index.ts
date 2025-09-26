@@ -12,58 +12,57 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 );
 
-// Функция предсказания уровня стресса на основе алгоритма логистической регрессии
-function predictStressLevel(data: any): number {
-  // Нормализация данных и веса признаков на основе важности для стресса
-  const weights = {
-    // Психологические факторы (высокий вес)
-    anxiety_level: 0.15,
-    depression: 0.14,
-    self_esteem: -0.10, // негативный вес - высокая самооценка снижает стресс
-    mental_health_history: 0.08,
-    
-    // Физиологические факторы
-    sleep_quality: -0.12, // плохой сон увеличивает стресс
-    headache: 0.08,
-    blood_pressure: 0.06,
-    breathing_problem: 0.07,
-    
-    // Академические факторы (высокий вес)
-    study_load: 0.13,
-    academic_performance: -0.09, // хорошая успеваемость снижает стресс
-    future_career_concerns: 0.11,
-    teacher_student_relationship: -0.08,
-    
-    // Социальные факторы
-    social_support: -0.10, // поддержка снижает стресс
-    peer_pressure: 0.09,
-    bullying: 0.12,
-    extracurricular_activities: -0.05,
-    
-    // Экологические факторы
-    living_conditions: -0.07,
-    safety: -0.06,
-    noise_level: 0.05,
-    basic_needs: -0.08
-  };
+// Функция предсказания уровня стресса с использованием Python модели
+async function predictStressLevel(data: any): Promise<number> {
+  const pythonApiUrl = Deno.env.get('PYTHON_API_URL');
   
-  // Вычисление взвешенной суммы
-  let weightedSum = 0;
-  for (const [feature, weight] of Object.entries(weights)) {
-    const value = data[feature] || 0;
-    // Нормализация значений к диапазону 0-1
-    const normalizedValue = Math.min(Math.max(value / 5, 0), 1);
-    weightedSum += normalizedValue * weight;
+  if (!pythonApiUrl) {
+    console.error('PYTHON_API_URL environment variable not set, using fallback prediction');
+    // Простой fallback на основе ключевых индикаторов
+    const anxiety = data.anxiety_level || 0;
+    const depression = data.depression || 0;
+    const sleep = data.sleep_quality || 5;
+    const stress = data.stress_level || 0;
+    
+    const avgStressIndicator = (anxiety + depression + (5 - sleep) + stress) / 4;
+    
+    if (avgStressIndicator < 1.5) return 0; // Low stress
+    if (avgStressIndicator < 3) return 1; // Moderate stress
+    return 2; // High stress
   }
-  
-  // Применение сигмоидной функции для получения вероятности
-  const sigmoid = (x: number) => 1 / (1 + Math.exp(-x));
-  const probability = sigmoid(weightedSum * 10 - 2); // масштабирование для лучшего разделения
-  
-  // Классификация на основе пороговых значений
-  if (probability < 0.35) return 0; // Низкий стресс
-  if (probability < 0.65) return 1; // Умеренный стресс  
-  return 2; // Высокий стресс
+
+  try {
+    const response = await fetch(`${pythonApiUrl}/predict`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Python API error: ${response.status} ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    console.log('Python model prediction result:', result);
+    
+    return result.predicted_class;
+  } catch (error) {
+    console.error('Error calling Python API:', error);
+    
+    // Fallback prediction if Python API is unavailable
+    const anxiety = data.anxiety_level || 0;
+    const depression = data.depression || 0;
+    const sleep = data.sleep_quality || 5;
+    const stress = data.stress_level || 0;
+    
+    const avgStressIndicator = (anxiety + depression + (5 - sleep) + stress) / 4;
+    
+    if (avgStressIndicator < 1.5) return 0;
+    if (avgStressIndicator < 3) return 1;
+    return 2;
+  }
 }
 
 async function generateRecommendations(stressClass: number, questionnaireData: any): Promise<string> {
@@ -212,7 +211,7 @@ serve(async (req) => {
     };
 
     // Предсказание уровня стресса с помощью вашей модели
-    const predictedStressClass = predictStressLevel(dataWithStressLevel);
+    const predictedStressClass = await predictStressLevel(dataWithStressLevel);
     
     console.log('Predicted stress class:', predictedStressClass);
 
