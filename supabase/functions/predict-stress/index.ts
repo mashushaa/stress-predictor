@@ -68,81 +68,117 @@ function predictStressLevel(data: any): number {
 
 async function generateRecommendations(stressClass: number, questionnaireData: any): Promise<string> {
   const yandexApiKey = Deno.env.get('YANDEX_GPT_API_KEY');
+  const yandexFolderId = Deno.env.get('YANDEX_FOLDER_ID');
   
-  if (!yandexApiKey) {
-    throw new Error('YANDEX_GPT_API_KEY не найден');
-  }
+  // Fallback рекомендации на основе класса стресса
+  const fallbackRecommendations = {
+    0: `**Отличные результаты!** Ваш уровень стресса находится в норме.
 
-  const stressLabels = {
-    0: "отсутствие стресса",
-    1: "позитивный стресс", 
-    2: "негативный стресс"
+**Рекомендации для поддержания благополучия:**
+• Продолжайте заниматься тем, что приносит вам удовольствие
+• Поддерживайте регулярный режим сна и питания
+• Развивайте свои сильные стороны и интересы
+• Помогайте другим студентам справляться со стрессом
+• Регулярно занимайтесь физической активностью`,
+
+    1: `**Позитивный стресс** может быть полезен для мотивации, но важно не допустить его перехода в негативный.
+
+**Рекомендации:**
+• Планируйте время для отдыха между учебными задачами
+• Используйте техники релаксации (дыхательные упражнения, медитация)
+• Поддерживайте социальные связи с друзьями и семьей
+• Занимайтесь физическими упражнениями для снятия напряжения
+• Обратитесь за поддержкой, если чувствуете перегрузку`,
+
+    2: `**Высокий уровень стресса** требует активных действий для улучшения самочувствия.
+
+**Неотложные рекомендации:**
+• Обратитесь к психологу или консультанту в университете
+• Пересмотрите свою учебную нагрузку и приоритеты
+• Обязательно выделяйте время для полноценного сна (7-9 часов)
+• Практикуйте техники управления стрессом ежедневно
+• Поговорите с близкими людьми о своих переживаниях
+• Рассмотрите возможность временного снижения нагрузки`
   };
 
-  const systemPrompt = `Ты - профессиональный психолог, специализирующийся на работе со студентами. 
-  Твоя задача - дать персональные рекомендации студенту на основе результатов анализа уровня стресса.
+  // Пытаемся получить персонализированные рекомендации через YandexGPT
+  if (yandexApiKey && yandexFolderId) {
+    try {
+      const stressLabels = {
+        0: "отсутствие стресса",
+        1: "позитивный стресс", 
+        2: "негативный стресс"
+      };
 
-  Результат анализа: ${stressLabels[stressClass as keyof typeof stressLabels]}
-  
-  Данные анкеты студента:
-  - Уровень тревожности: ${questionnaireData.anxiety_level}/4
-  - Самооценка: ${questionnaireData.self_esteem}/4
-  - История проблем с психическим здоровьем: ${questionnaireData.mental_health_history}/4
-  - Депрессия: ${questionnaireData.depression}/4
-  - Головные боли: ${questionnaireData.headache}/4
-  - Артериальное давление: ${questionnaireData.blood_pressure}/4
-  - Качество сна: ${questionnaireData.sleep_quality}/4
-  - Проблемы с дыханием: ${questionnaireData.breathing_problem}/4
-  - Уровень шума в окружении: ${questionnaireData.noise_level}/4
-  - Условия проживания: ${questionnaireData.living_conditions}/4
-  - Безопасность: ${questionnaireData.safety}/4
-  - Удовлетворение базовых потребностей: ${questionnaireData.basic_needs}/4
-  - Академическая успеваемость: ${questionnaireData.academic_performance}/4
-  - Учебная нагрузка: ${questionnaireData.study_load}/4
-  - Отношения с преподавателями: ${questionnaireData.teacher_student_relationship}/4
-  - Беспокойство о будущей карьере: ${questionnaireData.future_career_concerns}/4
-  - Социальная поддержка: ${questionnaireData.social_support}/4
-  - Давление сверстников: ${questionnaireData.peer_pressure}/4
-  - Внеучебные активности: ${questionnaireData.extracurricular_activities}/4
-  - Буллинг: ${questionnaireData.bullying}/4
+      const systemPrompt = `Ты - профессиональный психолог, специализирующийся на работе со студентами. 
+      Твоя задача - дать персональные рекомендации студенту на основе результатов анализа уровня стресса.
 
-  Дай персональные, практичные и конкретные рекомендации (3-5 пунктов) на русском языке. 
-  Будь эмпатичным, конструктивным и давай действенные советы.`;
+      Результат анализа: ${stressLabels[stressClass as keyof typeof stressLabels]}
+      
+      Данные анкеты студента:
+      - Уровень тревожности: ${questionnaireData.anxiety_level}/4
+      - Самооценка: ${questionnaireData.self_esteem}/4
+      - История проблем с психическим здоровьем: ${questionnaireData.mental_health_history}/4
+      - Депрессия: ${questionnaireData.depression}/4
+      - Головные боли: ${questionnaireData.headache}/4
+      - Артериальное давление: ${questionnaireData.blood_pressure}/4
+      - Качество сна: ${questionnaireData.sleep_quality}/4
+      - Проблемы с дыханием: ${questionnaireData.breathing_problem}/4
+      - Уровень шума в окружении: ${questionnaireData.noise_level}/4
+      - Условия проживания: ${questionnaireData.living_conditions}/4
+      - Безопасность: ${questionnaireData.safety}/4
+      - Удовлетворение базовых потребностей: ${questionnaireData.basic_needs}/4
+      - Академическая успеваемость: ${questionnaireData.academic_performance}/4
+      - Учебная нагрузка: ${questionnaireData.study_load}/4
+      - Отношения с преподавателями: ${questionnaireData.teacher_student_relationship}/4
+      - Беспокойство о будущей карьере: ${questionnaireData.future_career_concerns}/4
+      - Социальная поддержка: ${questionnaireData.social_support}/4
+      - Давление сверстников: ${questionnaireData.peer_pressure}/4
+      - Внеучебные активности: ${questionnaireData.extracurricular_activities}/4
+      - Буллинг: ${questionnaireData.bullying}/4
 
-  const response = await fetch('https://llm.api.cloud.yandex.net/foundationModels/v1/completion', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Api-Key ${yandexApiKey}`,
-    },
-    body: JSON.stringify({
-      modelUri: 'gpt://b1gfa3n2p0q5qunqp6b8/yandexgpt-lite',
-      completionOptions: {
-        stream: false,
-        temperature: 0.7,
-        maxTokens: 1000
-      },
-      messages: [
-        {
-          role: 'system',
-          text: systemPrompt
+      Дай персональные, практичные и конкретные рекомендации (3-5 пунктов) на русском языке. 
+      Будь эмпатичным, конструктивным и давай действенные советы.`;
+
+      const response = await fetch('https://llm.api.cloud.yandex.net/foundationModels/v1/completion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Api-Key ${yandexApiKey}`,
         },
-        {
-          role: 'user', 
-          text: 'Проанализируй мои данные и дай персональные рекомендации.'
-        }
-      ]
-    })
-  });
+        body: JSON.stringify({
+          modelUri: `gpt://${yandexFolderId}/yandexgpt-lite`,
+          completionOptions: {
+            stream: false,
+            temperature: 0.7,
+            maxTokens: 1000
+          },
+          messages: [
+            {
+              role: 'system',
+              text: systemPrompt
+            },
+            {
+              role: 'user', 
+              text: 'Проанализируй мои данные и дай персональные рекомендации.'
+            }
+          ]
+        })
+      });
 
-  if (!response.ok) {
-    const errorData = await response.text();
-    console.error('YandexGPT API error:', errorData);
-    throw new Error(`YandexGPT API error: ${response.status}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data.result.alternatives[0].message.text;
+      } else {
+        console.error('YandexGPT API error, using fallback recommendations');
+      }
+    } catch (error) {
+      console.error('Error calling YandexGPT:', error);
+    }
   }
 
-  const data = await response.json();
-  return data.result.alternatives[0].message.text;
+  // Возвращаем fallback рекомендации
+  return fallbackRecommendations[stressClass as keyof typeof fallbackRecommendations] || fallbackRecommendations[1];
 }
 
 serve(async (req) => {
