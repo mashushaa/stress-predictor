@@ -184,12 +184,15 @@ async function generateRecommendations(stressClass: number, questionnaireData: a
 
       if (response.ok) {
         const data = await response.json();
+        console.log('YandexGPT response success:', data);
         return data.result.alternatives[0].message.text;
       } else {
+        const errorText = await response.text();
+        console.error('YandexGPT API error:', response.status, response.statusText, errorText);
         console.error('YandexGPT API error, using fallback recommendations');
       }
     } catch (error) {
-      console.error('Error calling YandexGPT:', error);
+      console.error('Error calling YandexGPT:', error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -233,7 +236,8 @@ serve(async (req) => {
           no_stress: predictedStressClass === 0 ? 0.8 : 0.1,
           positive_stress: predictedStressClass === 1 ? 0.8 : 0.1,
           negative_stress: predictedStressClass === 2 ? 0.8 : 0.1,
-          predicted_class: predictedStressClass
+          predicted_class: predictedStressClass,
+          recommendations: recommendations // Сохраняем рекомендации в базу данных
         }
       });
 

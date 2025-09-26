@@ -165,7 +165,7 @@ const HistoryPage = () => {
         positive_stress: result.probabilities?.positive_stress ?? 0,
         negative_stress: result.probabilities?.negative_stress ?? 0
       },
-      recommendations: "Historical result - recommendations not available"
+      recommendations: result.probabilities?.recommendations || "Рекомендации недоступны для данного результата"
     };
 
     localStorage.setItem('predictionResults', JSON.stringify(resultData));

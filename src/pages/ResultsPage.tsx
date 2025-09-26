@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { RefreshCw, ArrowLeft, TrendingUp, Heart, Brain, History } from "lucide-react";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -184,9 +185,10 @@ const ResultsPage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-sm max-w-none text-muted-foreground whitespace-pre-line">
-                {results.recommendations}
-              </div>
+              <MarkdownRenderer 
+                content={results.recommendations}
+                className="text-muted-foreground"
+              />
             </CardContent>
           </Card>
 

@@ -118,6 +118,28 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  /* Стили для markdown контента */
+  .markdown-content ul {
+    list-style-type: disc;
+    margin-left: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .markdown-content li {
+    margin-bottom: 0.25rem;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .markdown-content p {
+    margin-bottom: 0.75rem;
+    color: hsl(var(--foreground));
+  }
+
+  .markdown-content strong {
+    font-weight: 600;
+    color: hsl(var(--foreground));
+  }
+
   body {
     @apply bg-background text-foreground;
   }
