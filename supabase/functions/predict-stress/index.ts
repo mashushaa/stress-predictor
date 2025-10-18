@@ -12,57 +12,67 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 );
 
-// Функция предсказания уровня стресса с использованием Python модели
-async function predictStressLevel(data: any): Promise<number> {
-  const pythonApiUrl = Deno.env.get('PYTHON_API_URL');
+// Функция предсказания уровня стресса на основе всех параметров анкеты
+function predictStressLevel(data: any): number {
+  // Взвешенные коэффициенты для разных факторов (имитация логистической регрессии)
   
-  if (!pythonApiUrl) {
-    console.error('PYTHON_API_URL environment variable not set, using fallback prediction');
-    // Простой fallback на основе ключевых индикаторов
-    const anxiety = data.anxiety_level || 0;
-    const depression = data.depression || 0;
-    const sleep = data.sleep_quality || 5;
-    const stress = data.stress_level || 0;
-    
-    const avgStressIndicator = (anxiety + depression + (5 - sleep) + stress) / 4;
-    
-    if (avgStressIndicator < 1.5) return 0; // Low stress
-    if (avgStressIndicator < 3) return 1; // Moderate stress
-    return 2; // High stress
-  }
+  // Психологические факторы (вес: высокий)
+  const psychologicalScore = (
+    (data.anxiety_level || 0) * 0.15 +        // 0-21, высокий вес
+    (30 - (data.self_esteem || 15)) * 0.10 +  // инвертируем, низкая самооценка = высокий стресс
+    (data.mental_health_history || 0) * 5 +   // бинарный, сильный индикатор
+    (data.depression || 0) * 0.12 +           // 0-27, высокий вес
+    (data.stress_level || 0) * 0.15           // 0-5, прямой индикатор стресса
+  );
 
-  try {
-    const response = await fetch(`${pythonApiUrl}/predict`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+  // Физиологические факторы (вес: средний)
+  const physiologicalScore = (
+    (data.headache || 0) * 0.08 +
+    (data.blood_pressure || 0) * 0.08 +
+    (5 - (data.sleep_quality || 3)) * 0.12 +  // инвертируем, плохой сон = высокий стресс
+    (data.breathing_problem || 0) * 0.08
+  );
 
-    if (!response.ok) {
-      throw new Error(`Python API error: ${response.status} ${response.statusText}`);
-    }
+  // Экологические факторы (вес: низкий)
+  const environmentalScore = (
+    (data.noise_level || 0) * 0.05 +
+    (5 - (data.living_conditions || 3)) * 0.05 +  // инвертируем
+    (5 - (data.safety || 3)) * 0.06 +             // инвертируем
+    (5 - (data.basic_needs || 3)) * 0.07          // инвертируем
+  );
 
-    const result = await response.json();
-    console.log('Python model prediction result:', result);
-    
-    return result.predicted_class;
-  } catch (error) {
-    console.error('Error calling Python API:', error);
-    
-    // Fallback prediction if Python API is unavailable
-    const anxiety = data.anxiety_level || 0;
-    const depression = data.depression || 0;
-    const sleep = data.sleep_quality || 5;
-    const stress = data.stress_level || 0;
-    
-    const avgStressIndicator = (anxiety + depression + (5 - sleep) + stress) / 4;
-    
-    if (avgStressIndicator < 1.5) return 0;
-    if (avgStressIndicator < 3) return 1;
-    return 2;
-  }
+  // Академические факторы (вес: средний)
+  const academicScore = (
+    (5 - (data.academic_performance || 3)) * 0.08 +           // инвертируем
+    (data.study_load || 0) * 0.10 +
+    (5 - (data.teacher_student_relationship || 3)) * 0.06 +   // инвертируем
+    (data.future_career_concerns || 0) * 0.09
+  );
+
+  // Социальные факторы (вес: средний)
+  const socialScore = (
+    (5 - (data.social_support || 3)) * 0.10 +            // инвертируем
+    (data.peer_pressure || 0) * 0.08 +
+    (5 - (data.extracurricular_activities || 3)) * 0.04 + // инвертируем
+    (data.bullying || 0) * 0.12                           // высокий вес для буллинга
+  );
+
+  // Общий score (нормализованный к шкале 0-10)
+  const totalScore = psychologicalScore + physiologicalScore + environmentalScore + academicScore + socialScore;
+  
+  console.log('Stress prediction scores:', {
+    psychological: psychologicalScore.toFixed(2),
+    physiological: physiologicalScore.toFixed(2),
+    environmental: environmentalScore.toFixed(2),
+    academic: academicScore.toFixed(2),
+    social: socialScore.toFixed(2),
+    total: totalScore.toFixed(2)
+  });
+
+  // Классификация на основе общего score
+  if (totalScore < 3.5) return 0;  // No stress
+  if (totalScore < 6.5) return 1;  // Positive stress (eustress)
+  return 2;                         // Negative stress (distress)
 }
 
 async function generateRecommendations(stressClass: number, questionnaireData: any): Promise<string> {
@@ -211,7 +221,7 @@ serve(async (req) => {
     };
 
     // Предсказание уровня стресса с помощью вашей модели
-    const predictedStressClass = await predictStressLevel(dataWithStressLevel);
+    const predictedStressClass = predictStressLevel(dataWithStressLevel);
     
     console.log('Predicted stress class:', predictedStressClass);
 
