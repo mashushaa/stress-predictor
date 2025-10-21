@@ -15,6 +15,8 @@ const supabase = createClient(
 // Функция предсказания уровня стресса через Railway API
 async function predictStressLevel(data: any): Promise<number> {
   try {
+    console.log('Sending data to Railway API:', JSON.stringify(data));
+    
     const response = await fetch('https://web-production-1b134.up.railway.app/predict', {
       method: 'POST',
       headers: {
@@ -23,17 +25,21 @@ async function predictStressLevel(data: any): Promise<number> {
       body: JSON.stringify(data)
     });
 
+    console.log('Railway API response status:', response.status);
+    
     if (!response.ok) {
-      throw new Error(`Railway API error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('Railway API error response:', errorText);
+      throw new Error(`Railway API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const result = await response.json();
-    console.log('Railway API prediction:', result);
+    console.log('Railway API prediction result:', result);
     
     return result.predicted_class;
   } catch (error) {
     console.error('Error calling Railway API:', error);
-    throw new Error('Failed to get prediction from model');
+    throw error;
   }
 }
 
