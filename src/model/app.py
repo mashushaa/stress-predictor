@@ -4,7 +4,8 @@ import pandas as pd
 
 app = Flask(__name__)
 
-with open('src/model/final_model.pkl', 'rb') as model_file:
+# В Railway файлы будут в корневой директории
+with open('final_model.pkl', 'rb') as model_file:
     model = pickle.load(model_file)
 
 @app.route('/predict', methods=['POST'])
