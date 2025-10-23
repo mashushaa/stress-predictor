@@ -15,10 +15,14 @@ const AuthPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
+  console.log('[AUTH PAGE] Component mounted');
+
   useEffect(() => {
+    console.log('[AUTH PAGE] Checking existing session...');
     // Check if user is already logged in
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      console.log('[AUTH PAGE] Session check result:', session ? 'logged in' : 'not logged in');
       if (session) {
         navigate("/");
       }
