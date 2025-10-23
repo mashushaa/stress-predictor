@@ -12,7 +12,7 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 );
 
-// Функция предсказания уровня стресса через Railway API
+// Function to predict stress level via Railway API
 async function predictStressLevel(data: any): Promise<{ predictedClass: number, probabilities: any }> {
   try {
     console.log('Sending data to Railway API:', JSON.stringify(data));
@@ -90,10 +90,10 @@ serve(async (req) => {
     
     console.log('Received questionnaire data:', questionnaireData);
 
-    // Убираем stress_level - это то, что мы предсказываем, а не входной признак
+    // Remove stress_level - that's what we're predicting, not an input feature
     const { stress_level, ...dataForPrediction } = questionnaireData;
 
-    // Предсказание уровня стресса с помощью вашей модели через Railway
+    // Predict stress level using your model via Railway
     const predictionResult = await predictStressLevel(dataForPrediction);
     const predictedStressClass = predictionResult.predictedClass;
     const probabilities = predictionResult.probabilities;
@@ -101,7 +101,7 @@ serve(async (req) => {
     console.log('Predicted stress class:', predictedStressClass);
     console.log('Probabilities:', probabilities);
 
-    // Генерация персональных рекомендаций
+    // Generate personalized recommendations
     const recommendations = await generateRecommendations(predictedStressClass, questionnaireData);
     
     console.log('Generated recommendations:', recommendations);
@@ -123,7 +123,7 @@ serve(async (req) => {
 
     if (saveError) {
       console.error('Error saving to database:', saveError);
-      throw new Error('Ошибка сохранения в базу данных');
+      throw new Error('Database save error');
     }
 
     const stressLabels = {
@@ -132,7 +132,7 @@ serve(async (req) => {
       2: "Negative Stress"
     };
 
-    // Находим максимальную вероятность для отображения confidence
+    // Find maximum probability for displaying confidence
     const maxProbability = Math.max(
       probabilities.no_stress,
       probabilities.positive_stress,
@@ -158,7 +158,7 @@ serve(async (req) => {
   } catch (error: any) {
     console.error('Error in predict-stress function:', error);
     return new Response(JSON.stringify({ 
-      error: error.message || 'Внутренняя ошибка сервера' 
+      error: error.message || 'Internal server error' 
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

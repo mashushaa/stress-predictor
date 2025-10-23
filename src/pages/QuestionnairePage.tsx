@@ -42,26 +42,26 @@ const QuestionnairePage = () => {
     }
   }, [user, authLoading, navigate]);
   const [formData, setFormData] = useState<QuestionnaireData>({
-    anxiety_level: 0,
-    self_esteem: 0,
-    mental_health_history: 0,
-    depression: 0,
-    headache: 0,
-    blood_pressure: 0,
-    sleep_quality: 0,
-    breathing_problem: 0,
-    noise_level: 0,
-    living_conditions: 0,
-    safety: 0,
-    basic_needs: 0,
-    academic_performance: 0,
-    study_load: 0,
-    teacher_student_relationship: 0,
-    future_career_concerns: 0,
-    social_support: 0,
-    peer_pressure: 0,
-    extracurricular_activities: 0,
-    bullying: 0,
+    anxiety_level: -1,
+    self_esteem: -1,
+    mental_health_history: -1,
+    depression: -1,
+    headache: -1,
+    blood_pressure: -1,
+    sleep_quality: -1,
+    breathing_problem: -1,
+    noise_level: -1,
+    living_conditions: -1,
+    safety: -1,
+    basic_needs: -1,
+    academic_performance: -1,
+    study_load: -1,
+    teacher_student_relationship: -1,
+    future_career_concerns: -1,
+    social_support: -1,
+    peer_pressure: -1,
+    extracurricular_activities: -1,
+    bullying: -1,
   });
 
   const sections: { title: string; fields: Field[] }[] = [
@@ -151,15 +151,15 @@ const QuestionnairePage = () => {
       }
 
       if (!data) {
-        throw new Error('Не удалось получить результаты предсказания');
+        throw new Error('Failed to get prediction results');
       }
 
       // Store results in localStorage for the results page
       localStorage.setItem('predictionResults', JSON.stringify(data));
       
       toast({
-        title: "Успешно",
-        description: "Ваши ответы обработаны и сохранены",
+        title: "Success",
+        description: "Your responses have been processed and saved",
       });
 
       // Navigate to results page
@@ -167,8 +167,8 @@ const QuestionnairePage = () => {
     } catch (error: any) {
       console.error('Error submitting questionnaire:', error);
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось обработать ответы. Попробуйте снова.",
+        title: "Error",
+        description: error.message || "Failed to process responses. Please try again.",
         variant: "destructive",
       });
     } finally {
