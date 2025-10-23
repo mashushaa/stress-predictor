@@ -153,6 +153,8 @@ const HistoryPage = () => {
 
   const viewResult = (result: HistoryResult) => {
     // Store result data for ResultsPage
+    console.log('Raw probabilities from DB:', result.probabilities);
+    
     const maxProbability = Math.max(
       result.probabilities?.no_stress ?? 0,
       result.probabilities?.positive_stress ?? 0,
@@ -171,6 +173,9 @@ const HistoryPage = () => {
       recommendations: result.recommendations || result.probabilities?.recommendations || "Recommendations are not available for this result"
     };
 
+    console.log('Converted probabilities (%):', resultData.probabilities);
+    console.log('Confidence:', resultData.confidence);
+    
     localStorage.setItem('predictionResults', JSON.stringify(resultData));
     window.location.href = '/results?from=history';
   };
