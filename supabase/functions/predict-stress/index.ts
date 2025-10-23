@@ -108,7 +108,6 @@ Factor Values:
 - peer_pressure: ${questionnaireData.peer_pressure} (0–5, where 0 = no pressure, 5 = high pressure)
 - extracurricular_activities: ${questionnaireData.extracurricular_activities} (0–5, where 0 = no participation, 5 = active participation)
 - bullying: ${questionnaireData.bullying} (0–5, where 0 = no bullying, 5 = high bullying)
-- stress_level: ${questionnaireData.stress_level} (0–5, where 0 = low, 5 = high)
 
 Task:
 1. Analyze the predicted stress class and the factor values, considering their specified ranges
@@ -182,19 +181,16 @@ serve(async (req) => {
     
     console.log('Received questionnaire data:', questionnaireData);
 
-    // Добавляем stress_level если его нет (можете настроить логику)
-    const dataWithStressLevel = {
-      ...questionnaireData,
-      stress_level: questionnaireData.stress_level || 2 // По умолчанию средний уровень
-    };
+    // Убираем stress_level - это то, что мы предсказываем, а не входной признак
+    const { stress_level, ...dataForPrediction } = questionnaireData;
 
     // Предсказание уровня стресса с помощью вашей модели через Railway
-    const predictedStressClass = await predictStressLevel(dataWithStressLevel);
+    const predictedStressClass = await predictStressLevel(dataForPrediction);
     
     console.log('Predicted stress class:', predictedStressClass);
 
     // Генерация персональных рекомендаций
-    const recommendations = await generateRecommendations(predictedStressClass, dataWithStressLevel);
+    const recommendations = await generateRecommendations(predictedStressClass, questionnaireData);
     
     console.log('Generated recommendations:', recommendations);
 
@@ -203,7 +199,7 @@ serve(async (req) => {
       .from('questionnaire_responses')
       .insert({
         user_id: userId,
-        ...dataWithStressLevel,
+        ...questionnaireData,
         probabilities: {
           no_stress: predictedStressClass === 0 ? 0.8 : 0.1,
           positive_stress: predictedStressClass === 1 ? 0.8 : 0.1,
