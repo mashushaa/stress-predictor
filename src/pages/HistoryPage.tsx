@@ -153,18 +153,20 @@ const HistoryPage = () => {
 
   const viewResult = (result: HistoryResult) => {
     // Store result data for ResultsPage
+    const maxProbability = Math.max(
+      result.probabilities?.no_stress ?? 0,
+      result.probabilities?.positive_stress ?? 0,
+      result.probabilities?.negative_stress ?? 0
+    );
+    
     const resultData = {
       stressLevel: getStressLabel(result.probabilities?.predicted_class ?? 0).label,
       stressClass: result.probabilities?.predicted_class ?? 0,
-      confidence: Math.max(
-        result.probabilities?.no_stress ?? 0,
-        result.probabilities?.positive_stress ?? 0,
-        result.probabilities?.negative_stress ?? 0
-      ),
+      confidence: Math.round(maxProbability * 100),
       probabilities: {
-        no_stress: result.probabilities?.no_stress ?? 0,
-        positive_stress: result.probabilities?.positive_stress ?? 0,
-        negative_stress: result.probabilities?.negative_stress ?? 0
+        no_stress: Math.round((result.probabilities?.no_stress ?? 0) * 100),
+        positive_stress: Math.round((result.probabilities?.positive_stress ?? 0) * 100),
+        negative_stress: Math.round((result.probabilities?.negative_stress ?? 0) * 100)
       },
       recommendations: result.recommendations || result.probabilities?.recommendations || "Recommendations are not available for this result"
     };
