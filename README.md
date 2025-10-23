@@ -1,73 +1,282 @@
-# Welcome to your Lovable project
+# Система Предсказания Уровня Стресса Студентов
 
-## Project info
+## 📋 Описание проекта
 
-**URL**: https://lovable.dev/projects/4150499c-06d0-437c-aa3b-5fb80bc89c46
+Дипломная работа по направлению "Разработка Машинного Обучения"
 
-## How can I edit this code?
+Данный проект представляет собой веб-приложение для анализа и прогнозирования уровня стресса студентов на основе методов машинного обучения. Система использует анкетирование для сбора данных о различных аспектах студенческой жизни и применяет модель машинного обучения для классификации уровня стресса на три категории: отсутствие стресса, позитивный стресс и негативный стресс.
 
-There are several ways of editing your application.
+### Основные возможности:
+- ✅ Интерактивное анкетирование с 20 параметрами оценки
+- 🤖 Прогнозирование уровня стресса с использованием ML модели
+- 📊 Визуализация результатов и распределения вероятностей
+- 📈 История прохождения тестов с динамикой изменений
+- 💡 Персонализированные рекомендации на основе результатов
+- 🔐 Аутентификация и защита данных пользователей
 
-**Use Lovable**
+## 🏗 Архитектура системы
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4150499c-06d0-437c-aa3b-5fb80bc89c46) and start prompting.
+### Frontend
+- **React 18** - UI библиотека
+- **TypeScript** - типизация
+- **Vite** - сборщик и dev-сервер
+- **Tailwind CSS** - стилизация
+- **shadcn/ui** - компонентная библиотека
+- **Chart.js** - визуализация данных
+- **React Router** - маршрутизация
 
-Changes made via Lovable will be committed automatically to this repo.
+### Backend
+- **Supabase** - Backend-as-a-Service
+  - PostgreSQL база данных
+  - Row Level Security (RLS) политики
+  - Edge Functions (Deno)
+  - Аутентификация пользователей
+- **Railway** - хостинг ML модели
+  - Flask API для предсказаний
+  - Pickle модель scikit-learn
 
-**Use your preferred IDE**
+### Машинное обучение
+- **Python 3.x**
+- **scikit-learn** - обучение модели
+- **pandas** - обработка данных
+- **Flask** - REST API для инференса
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 📊 Модель машинного обучения
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Входные параметры (20 признаков):
+1. **anxiety_level** - Уровень тревожности (0-21)
+2. **self_esteem** - Самооценка (0-30)
+3. **mental_health_history** - История ментального здоровья (0/1)
+4. **depression** - Депрессия (0-27)
+5. **headache** - Головные боли (0-5)
+6. **blood_pressure** - Давление (1-3)
+7. **sleep_quality** - Качество сна (0-5)
+8. **breathing_problem** - Проблемы с дыханием (1-5)
+9. **noise_level** - Уровень шума (1-5)
+10. **living_conditions** - Условия жизни (1-5)
+11. **safety** - Безопасность (1-5)
+12. **basic_needs** - Базовые потребности (1-5)
+13. **academic_performance** - Академическая успеваемость (1-5)
+14. **study_load** - Учебная нагрузка (1-5)
+15. **teacher_student_relationship** - Отношения с преподавателями (1-5)
+16. **future_career_concerns** - Беспокойство о карьере (1-5)
+17. **social_support** - Социальная поддержка (1-3)
+18. **peer_pressure** - Давление сверстников (0-5)
+19. **extracurricular_activities** - Внеучебная деятельность (0-5)
+20. **bullying** - Буллинг (0-5)
 
-Follow these steps:
+### Выходные данные:
+- **Класс стресса**: 0 (Нет стресса), 1 (Позитивный стресс), 2 (Негативный стресс)
+- **Вероятности**: Распределение вероятностей для каждого класса
+- **Уверенность**: Процент уверенности модели
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+### Файлы модели:
+- `src/model/final_model.pkl` - Обученная модель
+- `src/model/train_model.py` - Скрипт обучения
+- `src/model/app.py` - Flask API сервер
+- `src/model/requirements.txt` - Зависимости Python
+
+## 🗄 База данных
+
+### Таблицы:
+
+#### profiles
+Профили пользователей
+- `id` (UUID, PK) - ID пользователя
+- `email` (TEXT) - Email
+- `full_name` (TEXT) - Полное имя
+- `avatar_url` (TEXT) - URL аватара
+- `created_at` (TIMESTAMP) - Дата создания
+- `updated_at` (TIMESTAMP) - Дата обновления
+
+#### questionnaire_responses
+Ответы на анкеты и результаты предсказаний
+- `id` (UUID, PK) - ID записи
+- `user_id` (UUID, FK) - ID пользователя
+- `anxiety_level, self_esteem, ...` (INTEGER) - 20 параметров анкеты
+- `probabilities` (JSONB) - Вероятности классов
+- `recommendations` (TEXT) - Рекомендации
+- `created_at` (TIMESTAMP) - Дата прохождения теста
+- `updated_at` (TIMESTAMP) - Дата обновления
+
+## 🚀 Установка и запуск
+
+### Предварительные требования:
+- Node.js >= 18
+- npm или yarn
+- Git
+
+### Клонирование репозитория:
+```bash
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Установка зависимостей:
+```bash
+npm install
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Настройка переменных окружения:
+Создайте файл `.env` в корне проекта:
+```env
+VITE_SUPABASE_URL=https://gioyqixwydhnyihvhqvv.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### Запуск в режиме разработки:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Приложение будет доступно по адресу `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Сборка для продакшена:
+```bash
+npm run build
+```
 
-**Use GitHub Codespaces**
+## 📡 API Endpoints
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Edge Functions (Supabase)
 
-## What technologies are used for this project?
+#### POST /functions/v1/predict-stress
+Предсказание уровня стресса
 
-This project is built with:
+**Request Body:**
+```json
+{
+  "questionnaireData": {
+    "anxiety_level": 7,
+    "self_esteem": 20,
+    "mental_health_history": 1,
+    // ... остальные 17 параметров
+  },
+  "userId": "uuid"
+}
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+**Response:**
+```json
+{
+  "stressLevel": "No Stress",
+  "stressClass": 0,
+  "confidence": 99,
+  "probabilities": {
+    "no_stress": 99,
+    "positive_stress": 1,
+    "negative_stress": 0
+  },
+  "recommendations": "**Excellent results!** Your stress level is within normal range..."
+}
+```
 
-## How can I deploy this project?
+### ML Model API (Railway)
 
-Simply open [Lovable](https://lovable.dev/projects/4150499c-06d0-437c-aa3b-5fb80bc89c46) and click on Share -> Publish.
+#### POST https://web-production-1b134.up.railway.app/predict
+Прямой вызов ML модели
 
-## Can I connect a custom domain to my Lovable project?
+**Request Body:**
+```json
+{
+  "anxiety_level": 7,
+  "self_esteem": 20,
+  // ... все 20 параметров
+}
+```
 
-Yes, you can!
+**Response:**
+```json
+{
+  "predicted_class": 0,
+  "probabilities": {
+    "no_stress": 0.9936,
+    "positive_stress": 0.0006,
+    "negative_stress": 0.0058
+  }
+}
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 📄 Структура проекта
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+```
+├── src/
+│   ├── components/        # React компоненты
+│   │   ├── ui/           # shadcn/ui компоненты
+│   │   ├── MarkdownRenderer.tsx
+│   │   ├── QuestionnaireSection.tsx
+│   │   ├── QuestionnaireStep.tsx
+│   │   └── UserMenu.tsx
+│   ├── contexts/         # React контексты
+│   │   └── AuthContext.tsx
+│   ├── pages/            # Страницы приложения
+│   │   ├── AuthPage.tsx
+│   │   ├── HomePage.tsx
+│   │   ├── QuestionnairePage.tsx
+│   │   ├── ResultsPage.tsx
+│   │   └── HistoryPage.tsx
+│   ├── integrations/     # Интеграции
+│   │   └── supabase/
+│   ├── model/            # ML модель
+│   │   ├── app.py
+│   │   ├── train_model.py
+│   │   ├── final_model.pkl
+│   │   └── requirements.txt
+│   ├── hooks/            # Custom hooks
+│   ├── lib/              # Утилиты
+│   ├── index.css         # Глобальные стили
+│   └── main.tsx          # Точка входа
+├── supabase/
+│   ├── functions/        # Edge Functions
+│   │   └── predict-stress/
+│   │       └── index.ts
+│   └── config.toml       # Конфигурация Supabase
+├── public/               # Статические файлы
+├── tailwind.config.ts    # Конфигурация Tailwind
+├── vite.config.ts        # Конфигурация Vite
+└── package.json          # Зависимости проекта
+```
+
+## 🔒 Безопасность
+
+Проект использует Row Level Security (RLS) политики в Supabase:
+- Пользователи могут просматривать только свои данные
+- Создание записей только от своего имени
+- Обновление и удаление только собственных записей
+- Аутентификация через Supabase Auth
+
+## 📈 Использование
+
+1. **Регистрация/Вход**: Создайте аккаунт или войдите
+2. **Прохождение теста**: Заполните анкету из 20 вопросов
+3. **Получение результатов**: Просмотрите предсказанный уровень стресса, вероятности и рекомендации
+4. **Отслеживание динамики**: В разделе "История" отслеживайте изменения уровня стресса во времени
+
+## 🎓 Научная база
+
+Проект основан на исследованиях в области:
+- Психометрии и оценки ментального здоровья студентов
+- Машинного обучения для классификации
+- Анализа данных в образовательной среде
+
+## 📝 Лицензия
+
+Дипломная работа - все права защищены
+
+## 👨‍💻 Автор
+
+Дипломная работа по направлению "Разработка Машинного Обучения"
+
+## 🔗 Полезные ссылки
+
+- [Lovable Project](https://lovable.dev/projects/4150499c-06d0-437c-aa3b-5fb80bc89c46)
+- [Supabase Documentation](https://supabase.com/docs)
+- [scikit-learn Documentation](https://scikit-learn.org/)
+
+## 📞 Контакты и поддержка
+
+Для вопросов и предложений обращайтесь к автору проекта.
+
+---
+
+**Статус проекта**: ✅ Готов к защите
