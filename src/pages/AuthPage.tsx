@@ -88,12 +88,12 @@ const AuthPage = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl text-center">
-            {isSignUp ? "Sign in" : "Log in"}
+            {isSignUp ? "Sign Up" : "Log In"}
           </CardTitle>
           <CardDescription className="text-center">
             {isSignUp 
               ? "Create an account to preserve the results" 
-              : "Log in your account"
+              : "Log in to your account"
             }
           </CardDescription>
         </CardHeader>
@@ -124,7 +124,7 @@ const AuthPage = () => {
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isSignUp ? "Sign in" : "Log in"}
+              {isSignUp ? "Sign Up" : "Log In"}
             </Button>
           </form>
           <div className="mt-4 text-center">
@@ -134,8 +134,8 @@ const AuthPage = () => {
               className="text-sm text-blue-600 hover:underline"
             >
               {isSignUp 
-                ? "Already have an account? Log in" 
-                : "No account? Sign in"
+                ? "Already have an account? Log In" 
+                : "No account? Sign Up"
               }
             </button>
           </div>
