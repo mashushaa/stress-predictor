@@ -44,7 +44,7 @@ async function predictStressLevel(data: any): Promise<number> {
 }
 
 async function generateRecommendations(stressClass: number, questionnaireData: any): Promise<string> {
-  const huggingFaceToken = Deno.env.get('HUGGING_FACE_ACCESS_TOKEN');
+  const openRouterKey = Deno.env.get('OPENROUTER_API_KEY');
   
   // Fallback recommendations based on stress class
   const fallbackRecommendations = {
@@ -77,8 +77,8 @@ async function generateRecommendations(stressClass: number, questionnaireData: a
 • Consider temporarily reducing your workload`
   };
 
-  // Try to get personalized recommendations through Hugging Face API with DeepSeek model
-  if (huggingFaceToken) {
+  // Try to get personalized recommendations through OpenRouter API with DeepSeek model
+  if (openRouterKey) {
     try {
       const systemPrompt = `You are an experienced psychologist specializing in stress management, mental health, and well-being. Your task is to provide empathetic, supportive, and evidence-based recommendations for users based on the predicted stress class and the provided values for factors influencing stress.
 
@@ -130,40 +130,41 @@ Constraints:
 
       const userPrompt = 'Analyze my data and provide personalized recommendations.';
 
-      const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-large', {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${huggingFaceToken}`,
+          'Authorization': `Bearer ${openRouterKey}`,
           'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://gioyqixwydhnyihvhqvv.supabase.co',
+          'X-Title': 'Student Stress Predictor'
         },
         body: JSON.stringify({
-          inputs: `${systemPrompt}\n\nUser: ${userPrompt}\nAssistant:`,
-          parameters: {
-            max_length: 1000,
-            temperature: 0.7,
-            do_sample: true,
-            top_p: 0.9,
-            return_full_text: false
-          }
+          model: 'deepseek/deepseek-chat-v3.1:free',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 1000
         })
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Hugging Face API response success:', data);
+        console.log('OpenRouter API response success');
         
-        if (data && data[0] && data[0].generated_text) {
-          return data[0].generated_text.trim();
+        if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+          return data.choices[0].message.content.trim();
         } else {
           console.log('No generated text in response, using fallback');
         }
       } else {
         const errorText = await response.text();
-        console.error('Hugging Face API error:', response.status, response.statusText, errorText);
-        console.error('Hugging Face API error, using fallback recommendations');
+        console.error('OpenRouter API error:', response.status, response.statusText, errorText);
+        console.error('OpenRouter API error, using fallback recommendations');
       }
     } catch (error) {
-      console.error('Error calling Hugging Face API:', error instanceof Error ? error.message : String(error));
+      console.error('Error calling OpenRouter API:', error instanceof Error ? error.message : String(error));
     }
   }
 
