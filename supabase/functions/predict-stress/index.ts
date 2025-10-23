@@ -13,7 +13,7 @@ const supabase = createClient(
 );
 
 // Функция предсказания уровня стресса через Railway API
-async function predictStressLevel(data: any): Promise<number> {
+async function predictStressLevel(data: any): Promise<{ predictedClass: number, probabilities: any }> {
   try {
     console.log('Sending data to Railway API:', JSON.stringify(data));
     
@@ -36,7 +36,10 @@ async function predictStressLevel(data: any): Promise<number> {
     const result = await response.json();
     console.log('Railway API prediction result:', result);
     
-    return result.predicted_class;
+    return {
+      predictedClass: result.predicted_class,
+      probabilities: result.probabilities
+    };
   } catch (error) {
     console.error('Error calling Railway API:', error);
     throw error;
@@ -91,9 +94,12 @@ serve(async (req) => {
     const { stress_level, ...dataForPrediction } = questionnaireData;
 
     // Предсказание уровня стресса с помощью вашей модели через Railway
-    const predictedStressClass = await predictStressLevel(dataForPrediction);
+    const predictionResult = await predictStressLevel(dataForPrediction);
+    const predictedStressClass = predictionResult.predictedClass;
+    const probabilities = predictionResult.probabilities;
     
     console.log('Predicted stress class:', predictedStressClass);
+    console.log('Probabilities:', probabilities);
 
     // Генерация персональных рекомендаций
     const recommendations = await generateRecommendations(predictedStressClass, questionnaireData);
@@ -107,9 +113,9 @@ serve(async (req) => {
         user_id: userId,
         ...questionnaireData,
         probabilities: {
-          no_stress: predictedStressClass === 0 ? 0.8 : 0.1,
-          positive_stress: predictedStressClass === 1 ? 0.8 : 0.1,
-          negative_stress: predictedStressClass === 2 ? 0.8 : 0.1,
+          no_stress: probabilities.no_stress,
+          positive_stress: probabilities.positive_stress,
+          negative_stress: probabilities.negative_stress,
           predicted_class: predictedStressClass
         },
         recommendations: recommendations // Save recommendations in separate column
@@ -126,15 +132,22 @@ serve(async (req) => {
       2: "Negative Stress"
     };
 
+    // Находим максимальную вероятность для отображения confidence
+    const maxProbability = Math.max(
+      probabilities.no_stress,
+      probabilities.positive_stress,
+      probabilities.negative_stress
+    );
+
     const result = {
       stressLevel: stressLabels[predictedStressClass as keyof typeof stressLabels],
       stressClass: predictedStressClass,
       recommendations: recommendations,
-      confidence: 80, // Вы можете настроить это значение
+      confidence: Math.round(maxProbability * 100),
       probabilities: {
-        no_stress: predictedStressClass === 0 ? 80 : 10,
-        positive_stress: predictedStressClass === 1 ? 80 : 10,
-        negative_stress: predictedStressClass === 2 ? 80 : 10
+        no_stress: Math.round(probabilities.no_stress * 100),
+        positive_stress: Math.round(probabilities.positive_stress * 100),
+        negative_stress: Math.round(probabilities.negative_stress * 100)
       }
     };
 
