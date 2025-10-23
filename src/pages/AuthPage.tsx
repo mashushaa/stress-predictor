@@ -30,49 +30,65 @@ const AuthPage = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    console.log('[AUTH] Starting authentication process', { isSignUp, email });
+
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        console.log('[AUTH] Attempting sign up...');
+        const redirectTo = `${window.location.origin}/`;
+        console.log('[AUTH] Redirect URL:', redirectTo);
+        
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`
+            emailRedirectTo: redirectTo
           }
         });
 
+        console.log('[AUTH] Sign up response:', { data, error });
+
         if (error) {
+          console.error('[AUTH] Sign up error:', error);
           toast({
             title: "Registration error",
             description: error.message,
             variant: "destructive",
           });
         } else {
+          console.log('[AUTH] Sign up successful');
           toast({
             title: "Registration completed",
             description: "Check email to confirm the account",
           });
         }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        console.log('[AUTH] Attempting sign in...');
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
+        console.log('[AUTH] Sign in response:', { data, error });
+
         if (error) {
+          console.error('[AUTH] Sign in error:', error);
           toast({
             title: "Log in error",
             description: error.message,
             variant: "destructive",
           });
         } else {
+          console.log('[AUTH] Sign in successful');
           toast({
-            title: " Log in successful",
+            title: "Log in successful",
             description: "Welcome!",
           });
           navigate("/");
         }
       }
     } catch (error: any) {
+      console.error('[AUTH] Unexpected error:', error);
       toast({
         title: "Error",
         description: error.message,
@@ -80,6 +96,7 @@ const AuthPage = () => {
       });
     } finally {
       setIsLoading(false);
+      console.log('[AUTH] Authentication process ended');
     }
   };
 
